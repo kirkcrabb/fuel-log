@@ -107,6 +107,9 @@
   .history td:first-child{white-space:nowrap; font-weight:600}
   .history .sub{font-size:12px; color:var(--muted); font-weight:400}
 
+  .picksgroup{margin-top:4px}
+  .picksgroup + .picksgroup{margin-top:16px}
+  .picksLabel{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700; margin:0 0 8px}
   .empty{color:var(--muted); font-size:14px; padding:6px 0}
   .budget{font-size:14px; padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:12px}
   .budget b{font-variant-numeric:tabular-nums; color:var(--accent-ink)}
@@ -174,7 +177,14 @@
     <h3>Next meal &mdash; <em id="nmContext"></em></h3>
     <div class="card">
       <div class="budget" id="nmBudget"></div>
-      <div class="picks" id="nmPicks"></div>
+      <div class="picksgroup" id="nmMealGroup" hidden>
+        <div class="picksLabel">Meal</div>
+        <div class="picks" id="nmMealPicks"></div>
+      </div>
+      <div class="picksgroup" id="nmSnackGroup" hidden>
+        <div class="picksLabel">Snack</div>
+        <div class="picks" id="nmSnackPicks"></div>
+      </div>
       <div class="empty" id="nmEmpty" hidden>Ask Claude what to eat next and picks will appear here.</div>
     </div>
   </section>
@@ -255,18 +265,23 @@ const DATA = {
   goalWeight: 220,
   nextMeal: {
     context: "dinner on the 4pm drive, plus a shift snack",
-    picks: [
+    meals: [
       { place: "Chick-fil-A (Cougareat, BYU campus)", order: "Grilled nuggets (12-count) + side salad, dressing on the side", cal: 400, protein: 42, carbs: 12, note: "Go 12-count tonight - you skipped breakfast, so dinner carries more protein duty." },
       { place: "Cafe Rio (University Pkwy, Orem)", order: "Grilled chicken salad: salad only - no tortilla, no rice, no beans; pico + lime", cal: 400, protein: 40, carbs: 12, note: "The strict low-carb version." },
-      { place: "Cubby's (Provo)", order: "Tri-tip salad with vinaigrette", cal: 550, protein: 45, carbs: 15, note: "Heartiest option; take the vinaigrette over the sweet house dressings." },
-      { place: "Pack for the dispatch shift", order: "Tillamook Zero Sugar jerky + a Core Power shake", cal: 370, protein: 70, carbs: 10, note: "The shake closes the protein gap a skipped breakfast leaves - drink it whenever shift hunger hits." }
+      { place: "Cubby's (Provo)", order: "Tri-tip salad with vinaigrette", cal: 550, protein: 45, carbs: 15, note: "Heartiest option; take the vinaigrette over the sweet house dressings." }
+    ],
+    snacks: [
+      { place: "Pack for the dispatch shift", order: "Tillamook Zero Sugar jerky + a Core Power shake", cal: 370, protein: 70, carbs: 10, note: "The shake closes the protein gap a skipped breakfast leaves - drink it whenever shift hunger hits." },
+      { place: "Pack for the dispatch shift", order: "Core Power Elite shake only", cal: 230, protein: 42, carbs: 9, note: "Lighter option if you're not that hungry at shift start." },
+      { place: "Pack for the dispatch shift", order: "Tillamook Zero Sugar jerky (2.2 oz) only", cal: 140, protein: 28, carbs: 0, note: "Lightest option - just enough to hold you over." }
     ]
   },
   days: {
     "2026-07-16": {
       weight: 288.8,
       exercise: [
-        { name: "Stationary bike", minutes: 30, cal: 280 }
+        { name: "Stationary bike", minutes: 30, cal: 280 },
+        { name: "Walk (0.89 mi)", minutes: 24.6, cal: 174 }
       ],
       food: [
         { item: "Grilled chicken salad, oil & vinegar", meal: "lunch - greens, spinach, eggs, cucumber, cheese, broccoli, mushrooms, extra sunflower seeds", cal: 820, protein: 62, carbs: 18 }
@@ -373,17 +388,18 @@ const DATA = {
       ' <span class="tgt">(target '+fmt(tgt.cal)+' cal / '+fmt(tgt.protein)+'g protein'+
       (tgt.carbs!=null?' / max '+fmt(tgt.carbs)+'g carbs':'')+')</span>';
   }
-  if(nm && (nm.picks||[]).length){
-    $('nmContext').textContent=nm.context||'';
-    $('nmPicks').innerHTML=nm.picks.map((p,i)=>
+  function renderPickList(list){
+    return list.map((p,i)=>
       '<div class="pick"><div class="pickmain"><div class="place">'+esc(p.place)+'</div>'+
       '<div class="order">'+esc(p.order)+'</div>'+
       (p.note?'<div class="note">'+esc(p.note)+'</div>':'')+
       '<button class="logbtn" data-i="'+i+'">I ate this</button></div>'+
       '<div class="macros"><b>~'+fmt(p.cal)+' cal</b>'+fmt(p.protein)+'g protein &middot; '+fmt(p.carbs)+'g carbs</div></div>').join('');
-    document.querySelectorAll('.logbtn').forEach(b=>{
+  }
+  function wireLogButtons(container,list){
+    container.querySelectorAll('.logbtn').forEach(b=>{
       b.onclick=()=>{
-        const p=nm.picks[+b.dataset.i];
+        const p=list[+b.dataset.i];
         pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs});
         try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
         const msg='Fuel Log: I ate the '+p.place+' pick: '+p.order+' (~'+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs)';
@@ -399,6 +415,20 @@ const DATA = {
         else done(false);
       };
     });
+  }
+  const nmMeals=(nm&&nm.meals)||[], nmSnacks=(nm&&nm.snacks)||[];
+  if(nm && (nmMeals.length||nmSnacks.length)){
+    $('nmContext').textContent=nm.context||'';
+    if(nmMeals.length){
+      $('nmMealGroup').hidden=false;
+      $('nmMealPicks').innerHTML=renderPickList(nmMeals);
+      wireLogButtons($('nmMealPicks'),nmMeals);
+    }
+    if(nmSnacks.length){
+      $('nmSnackGroup').hidden=false;
+      $('nmSnackPicks').innerHTML=renderPickList(nmSnacks);
+      wireLogButtons($('nmSnackPicks'),nmSnacks);
+    }
   } else { $('nmEmpty').hidden=false; }
 
   // food table
