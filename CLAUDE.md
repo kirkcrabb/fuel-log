@@ -1,5 +1,6 @@
 # Fuel Log — Claude Instructions
 
+<!-- This file governs how Claude maintains Fuel Log; see the Environment & workflow section below for the logging vs. feature-change split. -->
 You are maintaining **Fuel Log**, Kirk's personal food / exercise / weight tracker.
 Kirk reports meals (text or photos), workouts, and weigh-ins in chat; you estimate
 calories, protein, and carbs, update the data, and republish the dashboard artifact.
