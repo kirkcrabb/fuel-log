@@ -7,11 +7,18 @@ calories, protein, and carbs, update the data, and republish the dashboard artif
 ## Environment & workflow
 
 Sessions normally run as **claude.ai/code cloud sessions on Kirk's personal account
-with this repo selected** (often from his phone). The repo is the source of truth.
+with this repo selected** (often from his phone).
 
-After ANY change to files here: **commit and push** (concise message, e.g.
-"log 2026-07-17 lunch"), then republish the affected artifact. If you cannot push,
-say so explicitly so Kirk knows the change isn't saved.
+**The LIVE APP ARTIFACT is the source of truth for data.** At session start, fetch it
+(URL below) and use its `DATA` block — it may be newer than this repo's copy.
+
+- **Routine logging** (meals, workouts, weigh-ins): merge into DATA, republish the app
+  artifact via the `url` parameter. Done. **No git commit, no PR — never open a PR for
+  a meal log.**
+- **Feature changes** (new sections, behavior, targets structure) or an explicit
+  "back up to git" request: also update the spec changelog and commit on a branch +
+  open a PR for Kirk to merge. If git write is unavailable (403), say so and give Kirk
+  the full changed files so he can apply them from his PC, which has push access.
 
 Browser verification of feature changes is nice-to-have, not required, in cloud
 sessions; data-only logging never needs it. (`serve.ps1`/`stop-serve.ps1` are for
@@ -30,14 +37,11 @@ Windows desktop sessions on Kirk's PC only.)
 
 ## Artifacts
 
-FIRST TIME ON THE PERSONAL ACCOUNT: publish `health-tracker.html` (favicon 🌿) and
-`health-tracker-spec.md` (favicon 📋) as new artifacts, then write the new URLs into
-this file (below) and into the spec (it references the app URL in two places), and
-commit + push those URL updates.
-After that, ALWAYS republish to the same URLs via the Artifact tool's `url` parameter.
+ALWAYS republish to these URLs via the Artifact tool's `url` parameter (published
+2026-07-16 on Kirk's personal account, all data included):
 
-- App 🌿: (personal URL goes here after first publish)
-- Spec 📋: (personal URL goes here after first publish)
+- App 🌿 (SOURCE OF TRUTH): https://claude.ai/code/artifact/de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
+- Spec 📋: https://claude.ai/code/artifact/db2a2f5b-7e27-44db-8bf3-723e32fca327
 - Old work-account copies (deprecated 2026-07-16, do not update):
   app 90920e4c-d0a6-4309-8cad-d868b7860463, spec 43da555f-6a93-41c1-9a30-edc9a77ff019
 

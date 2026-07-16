@@ -4,7 +4,7 @@ A personal food, exercise, and weight tracker that runs as a private Claude arti
 This document is the living spec: it is updated every time a change is requested,
 and the changelog at the bottom records each revision.
 
-**Live app:** https://claude.ai/code/artifact/90920e4c-d0a6-4309-8cad-d868b7860463
+**Live app:** https://claude.ai/code/artifact/de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
 
 ---
 
@@ -87,7 +87,7 @@ const DATA = {
 2. Edit only the `DATA` block — set `updated` to today, add/merge the day's entries.
 3. Republish the artifact (URL above) via the `url` parameter.
 4. For feature changes (not data logging): also update this spec, bump the changelog,
-   and republish it (spec artifact: https://claude.ai/code/artifact/43da555f-6a93-41c1-9a30-edc9a77ff019).
+   and republish it (spec artifact: https://claude.ai/code/artifact/db2a2f5b-7e27-44db-8bf3-723e32fca327).
 5. Keep the app HTML ASCII-only (HTML entities / `\u` escapes for special characters).
 
 **From a cloud session (Kirk logging from his phone, PC possibly off):**
@@ -104,6 +104,14 @@ const DATA = {
 ---
 
 ## Changelog
+
+### v2.10 — 2026-07-16
+- **Migrated to Kirk's personal Claude account.** New artifacts published (URLs above);
+  the doTERRA work-account copies are deprecated. Source lives in the private GitHub
+  repo `kirkcrabb/fuel-log`; the live app artifact is the source of truth for data.
+- Cloud-session workflow codified in CLAUDE.md: routine logging republishes the
+  artifact only (no git); feature changes go through a branch + PR (or hand the diff
+  to Kirk when the GitHub app lacks write access).
 
 ### v2.9.1 — 2026-07-15
 - Swapped line emphasis at Kirk's request: **raw weigh-ins are the bold line + dots**,
