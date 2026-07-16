@@ -36,10 +36,11 @@ Source of truth lives on Kirk's machine at `C:\Users\kcrabb\Documents\daybook-he
   recent logged day.
 - **Next meal** — remaining calorie/protein/carb budget for the day (computed against
   `DATA.targets`, currently 2,100 cal / 150 g protein / max 40 g carbs) plus
-  Claude-curated restaurant picks along Kirk's Pleasant Grove → Provo commute, each with
-  a specific order, estimated macros, and a note. Claude refreshes the picks when
-  logging meals. On BYU nights (Tue/Wed/Thu, dispatch shift until 1am) picks include a
-  packable shift snack.
+  Claude-curated picks along Kirk's Pleasant Grove → Provo commute, split into two
+  labeled groups, **Meal** and **Snack**, three picks each, each with a specific order,
+  estimated macros, and a note. Claude refreshes the picks when logging meals. On BYU
+  nights (Tue/Wed/Thu, dispatch shift until 1am) the snack picks are packable
+  shift-snack options.
 - **Goal & pace** — `DATA.goalWeight` (220 lbs) renders under the weight chart as
   "N lbs to goal · pace X lbs/wk · on track for <month>" once a week of weigh-ins exists.
 - **Weight progress** — dedicated line chart with **7d / 30d / 1y** range toggles,
@@ -104,6 +105,15 @@ const DATA = {
 ---
 
 ## Changelog
+
+### v2.11 — 2026-07-16
+- **Next-meal picks split into Meal and Snack groups**, three picks each, at Kirk's
+  request. `DATA.nextMeal.picks` (one flat array) replaced with `DATA.nextMeal.meals`
+  and `DATA.nextMeal.snacks` (each an array of 3 `{place, order, cal, protein, carbs,
+  note}` picks). The two groups render as separate labeled lists under one shared
+  remaining-budget line; each pick still has its own "I ate this" button.
+- Snack picks now offer three packable shift-snack sizes (jerky + shake combo, shake
+  alone, jerky alone) instead of one fixed combo.
 
 ### v2.10 — 2026-07-16
 - **Migrated to Kirk's personal Claude account.** New artifacts published (URLs above);
