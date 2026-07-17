@@ -54,6 +54,14 @@ ALWAYS republish to these URLs via the Artifact tool's `url` parameter (publishe
    numbers beat estimates; Kirk's Apple Watch calories beat MET estimates**
    (his 30-min stationary bike ≈ 280 active cal per the watch).
 3. Set `DATA.updated` to today. Refresh `DATA.nextMeal` picks for his remaining budget.
+   **`DATA.nextMeal.meals` should always have picks in it — never leave it empty.**
+   Cycle breakfast → lunch → dinner → next day's breakfast based on which meal types
+   are already logged for the current day; once dinner is logged, "next meal" means
+   tomorrow's breakfast. Pick the restaurant/at-home options per that day's schedule
+   pattern (see Schedule below) — e.g. a logged dinner on a Tue/Wed/Thu rolls over to
+   a Mon/Fri-style at-home breakfast if the next day is Mon/Fri. `DATA.nextMeal.snacks`
+   stays populated only when relevant (e.g. the Tue/Wed/Thu dispatch shift); otherwise
+   leave it empty and the snack group just won't render.
 4. Republish the app artifact (same URL). Keep the HTML **ASCII-only** — use HTML
    entities / \u escapes for any special characters.
 5. If Kirk says he ate a suggested pick, log the item using the pick's `order` string
