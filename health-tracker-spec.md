@@ -106,6 +106,16 @@ const DATA = {
 
 ## Changelog
 
+### v2.12 — 2026-07-16
+- **Fixed "I ate this" losing the log message on clipboard failure.** Artifacts render
+  in a sandboxed iframe that often doesn't delegate clipboard-write permission, so
+  `navigator.clipboard.writeText` silently fails on many devices/browsers - but the
+  page previously auto-reloaded 1.6s later regardless, wiping the toast (and the only
+  copy of the order text) before Kirk could read or manually copy it.
+- Toast now always shows the full log message as selectable text, stays open
+  indefinitely, and only reloads when Kirk taps a "Done, refresh" button. A "Copy"
+  button lets him retry the clipboard write on demand.
+
 ### v2.11 — 2026-07-16
 - **Next-meal picks split into Meal and Snack groups**, three picks each, at Kirk's
   request. `DATA.nextMeal.picks` (one flat array) replaced with `DATA.nextMeal.meals`
