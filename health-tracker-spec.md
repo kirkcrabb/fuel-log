@@ -106,6 +106,26 @@ const DATA = {
 
 ## Changelog
 
+### v2.14 — 2026-07-16
+- **`DATA.nextMeal.meals` must never be left empty** (codified in CLAUDE.md). Next-meal
+  picks now cycle breakfast → lunch → dinner → next day's breakfast based on which
+  meal types are already logged for the day, picking restaurant/at-home options that
+  match the relevant day's schedule pattern (e.g. dinner logged on a Tue/Wed/Thu rolls
+  to a Mon/Fri-style at-home breakfast if the next day is Mon/Fri). `snacks` stays
+  populated only when relevant (e.g. the dispatch shift) and is otherwise left empty.
+- Procedural change only - no code change to the rendering logic, which already
+  supports an empty `snacks` array and a populated `meals` array.
+
+### v2.13 — 2026-07-16
+- **Pending entries (from "I ate this" clicks) no longer count toward totals** - stat
+  tiles, remaining budget, food-table total row, 14-day charts, and history all now
+  skip `pending:true` food items. They still show as a tagged row in the food log for
+  visibility, but a test click (or a click Kirk hasn't confirmed yet) no longer skews
+  the numbers.
+- **Pending expiry shortened from 7 days to 10 minutes**, and is now based on an actual
+  timestamp (`ts` on each pending entry) rather than calendar-day granularity. An
+  unconfirmed click clears itself out quickly instead of lingering.
+
 ### v2.12 — 2026-07-16
 - **Fixed "I ate this" losing the log message on clipboard failure.** Artifacts render
   in a sandboxed iframe that often doesn't delegate clipboard-write permission, so

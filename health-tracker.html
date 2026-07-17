@@ -341,11 +341,13 @@ const DATA = {
   function localKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   const TODAY=localKey(new Date());
   let pending=[]; try{ pending=JSON.parse(localStorage.getItem(PKEY))||[]; }catch(e){}
-  const weekAgo=localKey(new Date(Date.now()-7*86400000));
+  const PENDING_TTL_MS=10*60*1000; // pending clicks expire after 10 min if never confirmed
+  const nowMs=Date.now();
   pending=pending.filter(p=>{
     const d=DATA.days[p.date];
     const synced=d&&(d.food||[]).some(f=>f.item===p.item||((f.cal||0)===p.cal&&(f.protein||0)===p.protein&&(f.carbs||0)===p.carbs));
-    return !synced && p.date>=weekAgo;
+    const fresh=p.ts!=null && (nowMs-p.ts)<PENDING_TTL_MS;
+    return !synced && fresh;
   });
   try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
   const DAYS=JSON.parse(JSON.stringify(DATA.days));
@@ -369,7 +371,7 @@ const DATA = {
 
   function dayTotals(d){
     const t={cal:0,pro:0,carb:0};
-    (d.food||[]).forEach(f=>{ t.cal+=f.cal||0; t.pro+=f.protein||0; t.carb+=f.carbs||0; });
+    (d.food||[]).forEach(f=>{ if(f.pending) return; t.cal+=f.cal||0; t.pro+=f.protein||0; t.carb+=f.carbs||0; });
     return t;
   }
   function parseKey(k){ const p=k.split('-'); return new Date(+p[0],p[1]-1,+p[2]); }
@@ -438,7 +440,7 @@ const DATA = {
     container.querySelectorAll('.logbtn').forEach(b=>{
       b.onclick=()=>{
         const p=list[+b.dataset.i];
-        pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs});
+        pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs,ts:Date.now()});
         try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
         showLogToast('Fuel Log: I ate the '+p.place+' pick: '+p.order+' (~'+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs)');
       };
