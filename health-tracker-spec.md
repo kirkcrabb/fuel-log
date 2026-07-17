@@ -106,6 +106,16 @@ const DATA = {
 
 ## Changelog
 
+### v2.13 — 2026-07-16
+- **Pending entries (from "I ate this" clicks) no longer count toward totals** - stat
+  tiles, remaining budget, food-table total row, 14-day charts, and history all now
+  skip `pending:true` food items. They still show as a tagged row in the food log for
+  visibility, but a test click (or a click Kirk hasn't confirmed yet) no longer skews
+  the numbers.
+- **Pending expiry shortened from 7 days to 10 minutes**, and is now based on an actual
+  timestamp (`ts` on each pending entry) rather than calendar-day granularity. An
+  unconfirmed click clears itself out quickly instead of lingering.
+
 ### v2.12 — 2026-07-16
 - **Fixed "I ate this" losing the log message on clipboard failure.** Artifacts render
   in a sandboxed iframe that often doesn't delegate clipboard-write permission, so
