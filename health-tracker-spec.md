@@ -45,7 +45,14 @@ Source of truth lives on Kirk's machine at `C:\Users\kcrabb\Documents\daybook-he
   "N lbs to goal · pace X lbs/wk · on track for <month>" once a week of weigh-ins exists.
 - **Weight progress** — dedicated line chart with **7d / 30d / 1y** range toggles,
   current weight, and change over the selected window (green when down, amber when up).
-- **Food log** — itemized table for the latest day with a totals row.
+- **Food log** — itemized table for the latest day with a totals row. Includes an
+  **"+ Add food" form** (item, meal/notes, calories, protein g, carbs g - Kirk's own
+  numbers, no Claude estimate needed) for logging without a chat round-trip; entries
+  stage in `localStorage` as **unsynced** (tagged, counted in totals, kept up to 7
+  days) until a **"Copy for Claude"** sync bar batches them into one message to paste
+  into a Claude session, which bakes them into `DATA` and clears the tag. Distinct
+  from the quick-pick "I ate this" **pending** flow (tagged, excluded from totals,
+  10-min TTL) - see Data model below for both shapes.
 - **Exercise** — the latest day's workouts with duration and estimated burn.
 - **Last 14 days** — bar charts for calories (green), protein (blue), carbs (amber),
   each with a running average.
@@ -75,8 +82,25 @@ const DATA = {
 ```
 
 - Date keys are local-time `YYYY-MM-DD`.
-- Daily calorie/protein/carb totals are computed from food items at render time.
+- Daily calorie/protein/carb totals are computed from food items at render time,
+  skipping any item flagged `pending:true` (see below).
 - Macro numbers are Claude's estimates — close, not lab-grade (noted in the page footer).
+
+### Client-side pending entries (not part of `DATA`, lives in `localStorage`)
+
+Two flows stage food items locally before Claude bakes them into `DATA`, both keyed
+`fuellog-pending-v1`, deduped against real `DATA` by item text or matching macros:
+
+| Flow | Trigger | `source` | TTL | Counted in totals? | Row tag |
+|---|---|---|---|---|---|
+| Quick-pick | "I ate this" on a next-meal pick | `'pick'` | 10 min | No (`pending:true`) | "pending" |
+| Manual entry | "+ Add food" form | `'manual'` | 7 days | Yes (`unsynced:true`) | "not yet saved" |
+
+Manual entries count toward totals immediately (Kirk supplies his own numbers, no
+estimate needed) so the running budget stays accurate through the day even before a
+sync. The sync bar's "Copy for Claude" button batches all outstanding `'manual'`
+entries (any date) into one message for a single end-of-day paste, instead of one
+round-trip per item.
 
 ## Update procedure (for Claude)
 
@@ -105,6 +129,19 @@ const DATA = {
 ---
 
 ## Changelog
+
+### v2.15 — 2026-07-18
+- **"+ Add food" form on the dashboard**, so Kirk can log food (his own item/cal/
+  protein/carbs) directly on the page without a Claude round-trip per item. New
+  entries stage in `localStorage` as **unsynced** - tagged "not yet saved," counted
+  toward totals immediately (unlike quick-pick pending entries, which stay excluded)
+  - and persist up to 7 days instead of the quick-pick flow's 10-minute TTL.
+- **New "Copy for Claude" sync bar** appears whenever unsynced manual entries exist;
+  batches all of them (any date) into one paste-able message, so Kirk can log
+  throughout the day and only need one Claude conversation to make it permanent,
+  instead of one per item.
+- Quick-pick "I ate this" flow unchanged (10-min TTL, excluded from totals) - the two
+  pending flows are distinguished internally by a `source: 'pick' | 'manual'` field.
 
 ### v2.14 — 2026-07-16
 - **`DATA.nextMeal.meals` must never be left empty** (codified in CLAUDE.md). Next-meal

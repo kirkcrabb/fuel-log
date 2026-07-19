@@ -139,6 +139,44 @@
     display:inline-block; margin-left:6px; padding:1px 7px; border-radius:99px;
     background:var(--warn); color:#fff; font-size:10px; font-weight:700; letter-spacing:.04em; vertical-align:middle;
   }
+  .unsyncedtag{
+    display:inline-block; margin-left:6px; padding:1px 7px; border-radius:99px;
+    background:var(--protein); color:#fff; font-size:10px; font-weight:700; letter-spacing:.04em; vertical-align:middle;
+  }
+  .syncbar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;
+    padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:var(--accent-soft);
+    color:var(--accent-ink); font-size:13px;
+  }
+  .syncbar button{
+    padding:6px 12px; border:1px solid var(--accent); border-radius:8px; background:var(--accent);
+    color:#fff; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+  }
+  .syncbar button:hover{background:var(--accent-ink); border-color:var(--accent-ink)}
+  .addfood{margin-bottom:14px}
+  .addfoodtoggle{
+    padding:6px 12px; border:1px solid var(--accent); border-radius:8px; background:transparent;
+    color:var(--accent-ink); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .addfoodtoggle:hover{background:var(--accent-soft)}
+  .addfoodform{
+    margin-top:10px; display:flex; flex-direction:column; gap:8px; border:1px solid var(--line);
+    border-radius:10px; padding:12px 14px;
+  }
+  .addfoodform input{
+    font:inherit; font-size:13.5px; padding:8px 10px; border:1px solid var(--line); border-radius:8px;
+    background:var(--bg); color:var(--ink); width:100%;
+  }
+  .addfoodform input:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+  .afrow{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+  .afactions{display:flex; gap:8px; justify-content:flex-end}
+  .afactions button{
+    padding:6px 12px; border-radius:8px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .afactions button[type="submit"]{border:1px solid var(--accent); background:var(--accent); color:#fff}
+  .afactions button[type="submit"]:hover{background:var(--accent-ink); border-color:var(--accent-ink)}
+  .afactions #afCancel{border:1px solid var(--line); background:transparent; color:var(--muted)}
+  .afactions #afCancel:hover{background:var(--accent-soft)}
   .toast{
     position:fixed; left:50%; bottom:24px; transform:translateX(-50%); max-width:92vw; width:360px;
     background:var(--ink); color:var(--bg); padding:14px 16px; border-radius:12px; font-size:13px;
@@ -220,6 +258,26 @@
   <section>
     <h3>Food log</h3>
     <div class="card">
+      <div class="syncbar" id="syncBar" hidden>
+        <span id="syncCount"></span>
+        <button type="button" id="syncCopyBtn">Copy for Claude</button>
+      </div>
+      <div class="addfood" id="addFoodWrap">
+        <button type="button" class="addfoodtoggle" id="addFoodToggle">+ Add food</button>
+        <form class="addfoodform" id="addFoodForm" hidden>
+          <input type="text" id="afItem" placeholder="Item (e.g. Grilled chicken sandwich)" required>
+          <input type="text" id="afMeal" placeholder="Meal / notes (optional)">
+          <div class="afrow">
+            <input type="number" id="afCal" placeholder="Cal" min="0" step="1" required>
+            <input type="number" id="afPro" placeholder="Protein g" min="0" step="1" required>
+            <input type="number" id="afCarb" placeholder="Carbs g" min="0" step="1" required>
+          </div>
+          <div class="afactions">
+            <button type="button" id="afCancel">Cancel</button>
+            <button type="submit">Add</button>
+          </div>
+        </form>
+      </div>
       <div class="tablewrap" id="foodWrap">
         <table>
           <thead><tr><th>Item</th><th class="n">Calories</th><th class="n">Protein g</th><th class="n">Carbs g</th></tr></thead>
@@ -270,24 +328,43 @@
 <script>
 // ===== DATA (maintained by Claude - edit only this block, then republish) =====
 const DATA = {
-  updated: "2026-07-16",
+  updated: "2026-07-18",
   weightUnit: "lbs",
   targets: { cal: 2100, protein: 150, carbs: 40 },
   goalWeight: 220,
   nextMeal: {
-    context: "dinner's done - shift snack still on deck",
+    context: "dinner tonight (Sat, unstructured)",
     meals: [
-      { place: "Chick-fil-A (Cougareat, BYU campus)", order: "Grilled nuggets (12-count) + side salad, dressing on the side", cal: 400, protein: 42, carbs: 12, note: "Go 12-count tonight - you skipped breakfast, so dinner carries more protein duty." },
-      { place: "Cafe Rio (University Pkwy, Orem)", order: "Grilled chicken salad: salad only - no tortilla, no rice, no beans; pico + lime", cal: 400, protein: 40, carbs: 12, note: "The strict low-carb version." },
-      { place: "Cubby's (Provo)", order: "Tri-tip salad with vinaigrette", cal: 550, protein: 45, carbs: 15, note: "Heartiest option; take the vinaigrette over the sweet house dressings." }
+      { place: "Chick-fil-A", order: "Grilled nuggets (12-count) + side salad, dressing on the side", cal: 400, protein: 42, carbs: 12, note: "Reliable low-carb go-to." },
+      { place: "Cafe Rio", order: "Grilled chicken salad: salad only - no tortilla, no rice, no beans; pico + lime", cal: 400, protein: 40, carbs: 12, note: "The strict low-carb version." },
+      { place: "Home", order: "Rotisserie chicken (grocery grab-and-go), skip the sides", cal: 300, protein: 38, carbs: 0, note: "Zero-cook, zero-carb - or fold into a family dinner if one's happening tonight." }
     ],
-    snacks: [
-      { place: "Pack for the dispatch shift", order: "Tillamook Zero Sugar jerky + a Core Power shake", cal: 370, protein: 70, carbs: 10, note: "The shake closes the protein gap a skipped breakfast leaves - drink it whenever shift hunger hits." },
-      { place: "Pack for the dispatch shift", order: "Core Power Elite shake only", cal: 230, protein: 42, carbs: 9, note: "Lighter option if you're not that hungry at shift start." },
-      { place: "Pack for the dispatch shift", order: "Tillamook Zero Sugar jerky (2.2 oz) only", cal: 140, protein: 28, carbs: 0, note: "Lightest option - just enough to hold you over." }
-    ]
+    snacks: []
   },
   days: {
+    "2026-07-18": {
+      weight: 286.6,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 265 }
+      ],
+      food: [
+        { item: "Double steak, fajita veggies, guac, cheese (bowl, no rice/beans)", meal: "Chipotle", cal: 680, protein: 73, carbs: 13 }
+      ]
+    },
+    "2026-07-17": {
+      weight: 287.3,
+      exercise: [
+        { name: "Stationary bike (7.25 mi)", minutes: 30, cal: 454 }
+      ],
+      food: [
+        { item: "Original Italian, in a bowl, Mike's Way", meal: "Jersey Mike's, no bread", cal: 520, protein: 28, carbs: 12 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 },
+        { item: "Bisteck a la Carreta (steak)", meal: "dinner - La Carreta, Peruvian", cal: 450, protein: 42, carbs: 4 },
+        { item: "House salad", meal: "dinner - La Carreta", cal: 120, protein: 2, carbs: 8 },
+        { item: "Cooked rice (1 cup)", meal: "dinner - La Carreta", cal: 205, protein: 4, carbs: 45 },
+        { item: "Low-carb pint ice cream, whole container", meal: "dessert - label: 630 cal, 55g total carb, 8g fiber, 42g sugar alcohol, 8g protein; net carbs shown", cal: 630, protein: 8, carbs: 5 }
+      ]
+    },
     "2026-07-16": {
       weight: 288.8,
       exercise: [
@@ -341,19 +418,23 @@ const DATA = {
   function localKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   const TODAY=localKey(new Date());
   let pending=[]; try{ pending=JSON.parse(localStorage.getItem(PKEY))||[]; }catch(e){}
-  const PENDING_TTL_MS=10*60*1000; // pending clicks expire after 10 min if never confirmed
+  const PICK_TTL_MS=10*60*1000; // quick-pick clicks expire after 10 min if never confirmed
+  const MANUAL_TTL_MS=7*24*60*60*1000; // manually-entered food stays staged until synced (or 7 days)
   const nowMs=Date.now();
   pending=pending.filter(p=>{
     const d=DATA.days[p.date];
     const synced=d&&(d.food||[]).some(f=>f.item===p.item||((f.cal||0)===p.cal&&(f.protein||0)===p.protein&&(f.carbs||0)===p.carbs));
-    const fresh=p.ts!=null && (nowMs-p.ts)<PENDING_TTL_MS;
+    const ttl=p.source==='manual'?MANUAL_TTL_MS:PICK_TTL_MS;
+    const fresh=p.ts!=null && (nowMs-p.ts)<ttl;
     return !synced && fresh;
   });
   try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
   const DAYS=JSON.parse(JSON.stringify(DATA.days));
   pending.forEach(p=>{
     const d=DAYS[p.date]=DAYS[p.date]||{};
-    (d.food=d.food||[]).push({item:p.item,meal:p.meal,cal:p.cal,protein:p.protein,carbs:p.carbs,pending:true});
+    const entry={item:p.item,meal:p.meal,cal:p.cal,protein:p.protein,carbs:p.carbs};
+    if(p.source==='manual') entry.unsynced=true; else entry.pending=true;
+    (d.food=d.food||[]).push(entry);
   });
   const keys=Object.keys(DAYS).sort();
 
@@ -427,11 +508,11 @@ const DATA = {
     function tryCopy(){
       if(navigator.clipboard&&navigator.clipboard.writeText){
         navigator.clipboard.writeText(msg).then(
-          ()=>render('Added to today as pending - copied. Paste it to Claude to make it permanent.'),
-          ()=>render("Added to today as pending. Couldn't copy automatically - tap the text below to select it, or just read it to Claude.")
+          ()=>render('Copied - paste it to Claude to make it permanent.'),
+          ()=>render("Couldn't copy automatically - tap the text below to select it, or just read it to Claude.")
         );
       } else {
-        render('Added to today as pending. Tap the text below to select it, or just read it to Claude.');
+        render('Tap the text below to select it, or just read it to Claude.');
       }
     }
     tryCopy();
@@ -440,12 +521,41 @@ const DATA = {
     container.querySelectorAll('.logbtn').forEach(b=>{
       b.onclick=()=>{
         const p=list[+b.dataset.i];
-        pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs,ts:Date.now()});
+        pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs,ts:Date.now(),source:'pick'});
         try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
         showLogToast('Fuel Log: I ate the '+p.place+' pick: '+p.order+' (~'+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs)');
       };
     });
   }
+
+  // manual "Add food" form: stages a food item you enter yourself (own macro numbers),
+  // counted toward totals immediately, kept until Claude syncs it into DATA (or 7 days)
+  function addManualFood(item,meal,cal,protein,carbs){
+    pending.push({date:TODAY,item:item,meal:meal,cal:cal,protein:protein,carbs:carbs,ts:Date.now(),source:'manual'});
+    try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
+    location.reload();
+  }
+  $('addFoodToggle').onclick=()=>{ $('addFoodForm').hidden=!$('addFoodForm').hidden; };
+  $('afCancel').onclick=()=>{ $('addFoodForm').hidden=true; $('addFoodForm').reset(); };
+  $('addFoodForm').onsubmit=e=>{
+    e.preventDefault();
+    const item=$('afItem').value.trim();
+    const meal=$('afMeal').value.trim();
+    const cal=+$('afCal').value, protein=+$('afPro').value, carbs=+$('afCarb').value;
+    if(!item || !isFinite(cal) || !isFinite(protein) || !isFinite(carbs)) return;
+    addManualFood(item,meal,cal,protein,carbs);
+  };
+  const unsyncedPending=pending.filter(p=>p.source==='manual');
+  if(unsyncedPending.length){
+    $('syncBar').hidden=false;
+    $('syncCount').textContent=unsyncedPending.length+(unsyncedPending.length===1?' entry':' entries')+' not yet saved to your history';
+    $('syncCopyBtn').onclick=()=>{
+      showLogToast('Fuel Log - please log these:\n'+unsyncedPending.map(p=>
+        '- '+p.date+': '+p.item+(p.meal?' ('+p.meal+')':'')+' - '+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs'
+      ).join('\n'));
+    };
+  }
+
   const nmMeals=(nm&&nm.meals)||[], nmSnacks=(nm&&nm.snacks)||[];
   if(nm && (nmMeals.length||nmSnacks.length)){
     $('nmContext').textContent=nm.context||'';
@@ -465,6 +575,7 @@ const DATA = {
   if(day && (day.food||[]).length){
     $('foodBody').innerHTML=day.food.map(f=>
       '<tr'+(f.pending?' style="opacity:.72"':'')+'><td>'+esc(f.item)+(f.pending?'<span class="pendingtag">pending</span>':'')+
+      (f.unsynced?'<span class="unsyncedtag">not yet saved</span>':'')+
       (f.meal?'<span class="meal">'+esc(f.meal)+'</span>':'')+'</td>'+
       '<td class="n">'+fmt(f.cal||0)+'</td><td class="n">'+fmt(f.protein||0)+'</td><td class="n">'+fmt(f.carbs||0)+'</td></tr>').join('');
     const t=dayTotals(day);
