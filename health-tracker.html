@@ -60,6 +60,16 @@
   .stat .swatch{width:8px; height:8px; border-radius:2px; display:inline-block}
   .stat .num{font-size:30px; font-weight:650; line-height:1.2; font-variant-numeric:tabular-nums; letter-spacing:-.02em; margin-top:6px}
   .stat .num small{font-size:13px; color:var(--muted); font-weight:500; letter-spacing:0}
+  .stat.progress{padding-bottom:12px}
+  .stat .bar{height:6px; border-radius:99px; background:var(--line); overflow:hidden; margin-top:10px}
+  .stat .bar .fill{height:100%; border-radius:99px; transition:width .3s; width:0}
+  .stat .pct{font-size:11px; color:var(--muted); margin-top:5px; font-variant-numeric:tabular-nums; font-weight:600}
+  .stat .fill.good{background:var(--good)}
+  .stat .fill.warn{background:var(--warn)}
+  .stat .fill.bad{background:var(--bad)}
+  .stat .pct.good{color:var(--good)}
+  .stat .pct.warn{color:var(--warn)}
+  .stat .pct.bad{color:var(--bad)}
 
   .card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow:var(--shadow)}
   table{width:100%; border-collapse:collapse; font-size:14px}
@@ -215,9 +225,24 @@
   <section>
     <h3 id="latestTitle">Latest day</h3>
     <div class="stats">
-      <div class="stat"><div class="label"><span class="swatch" style="background:var(--accent)"></span>Calories</div><div class="num" id="tCal">&ndash;</div></div>
-      <div class="stat"><div class="label"><span class="swatch" style="background:var(--protein)"></span>Protein</div><div class="num" id="tPro">&ndash;</div></div>
-      <div class="stat"><div class="label"><span class="swatch" style="background:var(--carbs)"></span>Carbs</div><div class="num" id="tCarb">&ndash;</div></div>
+      <div class="stat progress">
+        <div class="label"><span class="swatch" style="background:var(--accent)"></span>Calories</div>
+        <div class="num" id="tCal">&ndash;</div>
+        <div class="bar"><div class="fill" id="tCalFill"></div></div>
+        <div class="pct" id="tCalPct"></div>
+      </div>
+      <div class="stat progress">
+        <div class="label"><span class="swatch" style="background:var(--protein)"></span>Protein</div>
+        <div class="num" id="tPro">&ndash;</div>
+        <div class="bar"><div class="fill" id="tProFill"></div></div>
+        <div class="pct" id="tProPct"></div>
+      </div>
+      <div class="stat progress">
+        <div class="label"><span class="swatch" style="background:var(--carbs)"></span>Carbs</div>
+        <div class="num" id="tCarb">&ndash;</div>
+        <div class="bar"><div class="fill" id="tCarbFill"></div></div>
+        <div class="pct" id="tCarbPct"></div>
+      </div>
       <div class="stat"><div class="label">Weight</div><div class="num" id="tWeight">&ndash;</div></div>
     </div>
   </section>
@@ -328,27 +353,108 @@
 <script>
 // ===== DATA (maintained by Claude - edit only this block, then republish) =====
 const DATA = {
-  updated: "2026-07-18",
+  updated: "2026-07-25",
   weightUnit: "lbs",
   targets: { cal: 2100, protein: 150, carbs: 40 },
   goalWeight: 220,
   nextMeal: {
-    context: "dinner tonight (Sat, unstructured)",
+    context: "breakfast tomorrow (Sun, unstructured)",
     meals: [
-      { place: "Chick-fil-A", order: "Grilled nuggets (12-count) + side salad, dressing on the side", cal: 400, protein: 42, carbs: 12, note: "Reliable low-carb go-to." },
-      { place: "Cafe Rio", order: "Grilled chicken salad: salad only - no tortilla, no rice, no beans; pico + lime", cal: 400, protein: 40, carbs: 12, note: "The strict low-carb version." },
-      { place: "Home", order: "Rotisserie chicken (grocery grab-and-go), skip the sides", cal: 300, protein: 38, carbs: 0, note: "Zero-cook, zero-carb - or fold into a family dinner if one's happening tonight." }
+      { place: "Home", order: "Turkey + pepper jack roll-ups (4 roll-ups: 1 turkey slice + 1 cheese slice each, no bread)", cal: 320, protein: 36, carbs: 4, note: "Zero-effort, zero-cook." },
+      { place: "Home", order: "Hard-boiled eggs (3)", cal: 210, protein: 18, carbs: 2, note: "Make a batch ahead so it's grab-and-go." },
+      { place: "Home", order: "Fairlife Core Power Elite shake", cal: 230, protein: 42, carbs: 9, note: "Straight from the fridge, no prep at all." }
     ],
     snacks: []
   },
   days: {
+    "2026-07-25": {
+      food: [
+        { item: "Blue bacon cheeseburger (half, with bun)", meal: "lunch", cal: 400, protein: 20, carbs: 25 },
+        { item: "Salad (10 oz) with ranch, no croutons", meal: "lunch", cal: 270, protein: 4, carbs: 11 },
+        { item: "Steak (11 oz, half of 22 oz)", meal: "dinner", cal: 850, protein: 70, carbs: 0 },
+        { item: "Side salad, greens/cheese/tomato (light portion)", meal: "dinner", cal: 80, protein: 4, carbs: 4 },
+        { item: "Stuffed mushrooms (3), cheese-stuffed with baked cheese", meal: "dinner", cal: 270, protein: 12, carbs: 6 },
+        { item: "Ear of corn, buttered", meal: "dinner", cal: 140, protein: 3, carbs: 19 }
+      ]
+    },
+    "2026-07-24": {
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 350 }
+      ],
+      food: [
+        { item: "1/2 rotisserie chicken, avocado side, stir fry vegetables side", meal: "Red Fuego", cal: 920, protein: 70, carbs: 22 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 },
+        { item: "Deep-fried sushi roll: albacore tuna, spicy crab, cream cheese, avocado, house sauce", meal: "dinner", cal: 700, protein: 22, carbs: 60 }
+      ]
+    },
+    "2026-07-23": {
+      weight: 284,
+      exercise: [
+        { name: "Stationary bike", minutes: 38, cal: 535 }
+      ],
+      food: [
+        { item: "Hard-boiled egg (1)", meal: "breakfast", cal: 70, protein: 6, carbs: 1 },
+        { item: "Sassy Scotty chicken salad (2 scoops), on greens", meal: "lunch - Chicken Salad Chick", cal: 650, protein: 24, carbs: 4 },
+        { item: "Broccoli salad (side)", meal: "lunch - Chicken Salad Chick", cal: 200, protein: 4, carbs: 10 },
+        { item: "Wingstop classic wings (10-ct), Louisiana Rub", meal: "dinner", cal: 750, protein: 65, carbs: 2 },
+        { item: "Core Power Elite shake", meal: "before bed", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-07-22": {
+      weight: 285.5,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 439 }
+      ],
+      food: [
+        { item: "Wingstop classic wings (15-ct), Louisiana + Cajun dry rub", meal: "lunch", cal: 1125, protein: 98, carbs: 3 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-07-21": {
+      weight: 284.4,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 422 }
+      ],
+      food: [
+        { item: "Muscle Milk vanilla shake (42g protein)", meal: "breakfast", cal: 240, protein: 42, carbs: 14 },
+        { item: "Grilled chicken salad, double chicken - mixed greens, spinach, broccoli, cheese, eggs, sunflower seeds", meal: "lunch", cal: 760, protein: 88, carbs: 15 },
+        { item: "Blue cheese dressing (2 x 2 oz cups)", meal: "lunch", cal: 580, protein: 4, carbs: 8 },
+        { item: "Grilled nuggets (8-ct)", meal: "dinner - Chick-fil-A", cal: 270, protein: 28, carbs: 8 },
+        { item: "Side salad", meal: "dinner - Chick-fil-A", cal: 70, protein: 4, carbs: 5 },
+        { item: "Garden Herb Ranch dressing", meal: "dinner - Chick-fil-A", cal: 280, protein: 1, carbs: 2 },
+        { item: "Tillamook Zero Sugar smoked sausages (2 servings, 6 sticks)", meal: "shift snack", cal: 240, protein: 18, carbs: 0 }
+      ]
+    },
+    "2026-07-20": {
+      weight: 285.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 367 }
+      ],
+      food: [
+        { item: "Hard-boiled eggs (3)", meal: "breakfast", cal: 210, protein: 18, carbs: 2 },
+        { item: "Salad, no tortilla/beans/rice, double steak", meal: "lunch - Costa Vida", cal: 650, protein: 55, carbs: 12 },
+        { item: "Fairlife Core Power Elite shake", meal: "snack", cal: 230, protein: 42, carbs: 9 },
+        { item: "Carne asada steak", meal: "dinner", cal: 450, protein: 48, carbs: 3 },
+        { item: "Gelato (5 oz cup)", meal: "dessert", cal: 310, protein: 6, carbs: 37 }
+      ]
+    },
+    "2026-07-19": {
+      food: [
+        { item: "Hard-boiled eggs (2)", meal: "breakfast", cal: 140, protein: 12, carbs: 1 },
+        { item: "Muscle Milk Pro Series shake", meal: "breakfast", cal: 240, protein: 42, carbs: 14 },
+        { item: "Brisket (1/2 lb)", meal: "lunch", cal: 670, protein: 58, carbs: 0 },
+        { item: "Pulled pork (1/2 lb)", meal: "lunch", cal: 530, protein: 48, carbs: 0 },
+        { item: "BBQ sauce", meal: "lunch", cal: 90, protein: 0, carbs: 20 }
+      ]
+    },
     "2026-07-18": {
       weight: 286.6,
       exercise: [
         { name: "Stationary bike", minutes: 30, cal: 265 }
       ],
       food: [
-        { item: "Double steak, fajita veggies, guac, cheese (bowl, no rice/beans)", meal: "Chipotle", cal: 680, protein: 73, carbs: 13 }
+        { item: "Double steak, fajita veggies, guac, cheese (bowl, no rice/beans)", meal: "Chipotle", cal: 680, protein: 73, carbs: 13 },
+        { item: "Pho, beef (all the meat, partial broth) + ~1 cup rice noodles", meal: "dinner", cal: 470, protein: 37, carbs: 49 }
       ]
     },
     "2026-07-17": {
@@ -465,11 +571,23 @@ const DATA = {
 
   if(latest){ $('latestTitle').innerHTML='Latest day &mdash; <em>'+dayLabel(latest)+'</em>'; }
 
+  function setStat(key,val,target,unit,floor,warnAt,badAt){
+    $('t'+key).innerHTML=fmt(val)+(target!=null?' <small>/ '+fmt(target)+unit+'</small>':'');
+    if(target){
+      const pct=Math.round(val/target*100);
+      const cls=floor?(pct>=100?'good':(pct>=warnAt?'warn':'bad')):(pct<warnAt?'good':(pct<badAt?'warn':'bad'));
+      $('t'+key+'Fill').style.width=Math.min(pct,100)+'%';
+      $('t'+key+'Fill').className='fill '+cls;
+      $('t'+key+'Pct').textContent=pct+'%';
+      $('t'+key+'Pct').className='pct '+cls;
+    }
+  }
   if(day){
     const t=dayTotals(day);
-    $('tCal').textContent=fmt(t.cal);
-    $('tPro').innerHTML=fmt(t.pro)+' <small>g</small>';
-    $('tCarb').innerHTML=fmt(t.carb)+' <small>g</small>';
+    const tg=DATA.targets||{};
+    setStat('Cal',t.cal,tg.cal,' cal',false,90,110);
+    setStat('Pro',t.pro,tg.protein,'g',true,70,100);
+    setStat('Carb',t.carb,tg.carbs,'g',false,75,100);
     if(day.weight!=null) $('tWeight').innerHTML=day.weight+' <small>'+DATA.weightUnit+'</small>';
   }
 
