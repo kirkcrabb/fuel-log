@@ -32,8 +32,15 @@ Source of truth lives on Kirk's machine at `C:\Users\kcrabb\Documents\daybook-he
 
 ## Dashboard sections
 
-- **Latest day** — stat tiles for calories, protein, carbs, and weight for the most
-  recent logged day.
+- **Latest day** — stat tiles for the most recent logged day. Calories, protein, and
+  carbs render as progress tiles (consumed / target, percentage, and a fill bar) against
+  `DATA.targets`; weight renders as a plain number (no daily target to progress
+  toward). Color coding is direction-aware: protein is a floor (bad below 70%, warn
+  70-99%, good at/above 100% — more is fine), calories and carbs are caps (good below
+  the warn threshold, warn approaching target, bad at/above 100% — carbs' warn
+  threshold is stricter at 75% since it's a stricter self-imposed cap; calories warns
+  at 90%). The fill bar visually caps at 100% width even when the percentage exceeds
+  it (e.g. carbs at 163%), so the text is the source of truth for overages.
 - **Next meal** — remaining calorie/protein/carb budget for the day (computed against
   `DATA.targets`, currently 2,100 cal / 150 g protein / max 40 g carbs) plus
   Claude-curated picks along Kirk's Pleasant Grove → Provo commute, split into two
@@ -129,6 +136,14 @@ round-trip per item.
 ---
 
 ## Changelog
+
+### v2.16 — 2026-07-25
+- **Latest-day calorie/protein/carb tiles now show progress against target**, at
+  Kirk's request, instead of a bare number. Each tile reads "consumed / target,"
+  a percentage, and a color-coded fill bar (green/amber/red). Protein is treated as
+  a floor (green once at/above 100%), calories and carbs as caps (red once at/above
+  100%, with carbs warning earlier at 75% since it's the stricter self-imposed
+  limit). Weight tile is unchanged (plain number, no daily target).
 
 ### v2.15 — 2026-07-18
 - **"+ Add food" form on the dashboard**, so Kirk can log food (his own item/cal/
