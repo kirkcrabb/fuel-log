@@ -137,6 +137,14 @@ round-trip per item.
 
 ## Changelog
 
+### v2.17 — 2026-07-28
+- **Codified pick rotation in CLAUDE.md** at Kirk's request, after noticing next-meal
+  dinner/snack picks kept reusing the same 2-3 options as a fixed template instead of
+  drawing from the full known list (Costa Vida and Mo' Bettahs were in the schedule
+  notes the whole time but rarely suggested). Snack options expanded beyond
+  jerky/shake to include the Pro2Go Protein Pack, string cheese, turkey roll-ups, and
+  plain hard-boiled eggs. Procedural change only - no code/rendering change.
+
 ### v2.16 — 2026-07-25
 - **Latest-day calorie/protein/carb tiles now show progress against target**, at
   Kirk's request, instead of a bare number. Each tile reads "consumed / target,"

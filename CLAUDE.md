@@ -61,7 +61,9 @@ ALWAYS republish to these URLs via the Artifact tool's `url` parameter (publishe
    pattern (see Schedule below) — e.g. a logged dinner on a Tue/Wed/Thu rolls over to
    a Mon/Fri-style at-home breakfast if the next day is Mon/Fri. `DATA.nextMeal.snacks`
    stays populated only when relevant (e.g. the Tue/Wed/Thu dispatch shift); otherwise
-   leave it empty and the snack group just won't render.
+   leave it empty and the snack group just won't render. **Actually rotate the picks
+   each time — check what the last few days' meals/snacks were and reach for
+   different options, don't reuse the same 3 as a template.**
 4. Republish the app artifact (same URL). Keep the HTML **ASCII-only** — use HTML
    entities / \u escapes for any special characters.
 5. If Kirk says he ate a suggested pick, log the item using the pick's `order` string
@@ -80,12 +82,19 @@ ALWAYS republish to these URLs via the Artifact tool's `url` parameter (publishe
 - **Tue / Wed / Thu:** ~9am home (east Pleasant Grove, UT) → doTERRA office (west PG
   at I-15). Breakfast leg stops: Maverik (State St), Chick-fil-A (Valley Grove at
   PG Blvd/I-15), Macey's (State St). Lunch: doTERRA cafeteria salad bar (double
-  chicken, oil & vinegar; skip peas/pickled-beet scoops). ~4pm → BYU 2120 JKB (Provo)
-  via I-15/University Pkwy: Chick-fil-A (Orem + Cougareat on campus), Cafe Rio,
-  Costa Vida, Mo' Bettahs, Cubby's. **Dispatch shift until 1am — he cannot leave, so
-  always include a packable shift snack with dinner picks** (Tillamook Zero Sugar
-  jerky is a favorite: 2.2 oz pkg = 140 cal / 28 P / 0 C; Core Power Elite shake =
-  230 cal / 42 P / 9 C).
+  chicken, oil & vinegar; skip peas/pickled-beet scoops) — or, since he's said he
+  gets tired of salad, a change-of-pace lunch pick (Wingstop dry-rub wings, Chipotle,
+  Chicken Salad Chick on greens) is equally valid; don't default to the cafeteria
+  every time. ~4pm → BYU 2120 JKB (Provo) via I-15/University Pkwy: Chick-fil-A
+  (Orem + Cougareat on campus), Cafe Rio, Costa Vida, Mo' Bettahs, Cubby's.
+  **Rotate through this full dinner list — don't default to the same 2-3 every time;
+  reach for whichever ones haven't come up recently.** **Dispatch shift until 1am —
+  he cannot leave, so always include a packable shift snack with dinner picks; rotate
+  the snack too, don't default to the same one.** Snack options: Tillamook Zero Sugar
+  jerky (2.2 oz pkg = 140 cal / 28 P / 0 C), Core Power Elite shake (230 cal / 42 P /
+  9 C), jerky + shake combo (370 cal / 70 P / 10 C), Pro2Go Protein Pack (hard-boiled
+  egg + Genoa salami + pepper jack stick, 260 cal / 18 P / 0 C), string cheese,
+  turkey + pepper jack roll-ups, plain hard-boiled eggs.
 - **Mon / Fri:** home all day. Never suggest the doTERRA cafe or the Provo corridor.
   He often skips breakfast/lunch from low motivation — suggest zero-effort protein
   (turkey + pepper jack roll-ups ≈ 5 g carbs instead of his bread sandwich).
