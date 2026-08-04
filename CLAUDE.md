@@ -38,13 +38,19 @@ Windows desktop sessions on Kirk's PC only.)
 
 ## Artifacts
 
-ALWAYS republish to these URLs via the Artifact tool's `url` parameter (published
-2026-07-16 on Kirk's personal account, all data included):
+ALWAYS republish to these URLs via the Artifact tool's `url` parameter:
 
-- App 🌿 (SOURCE OF TRUTH): https://claude.ai/code/artifact/de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
+- App 🌿 (SOURCE OF TRUTH, migrated 2026-08-04): https://claude.ai/code/artifact/6016fa31-707b-42fa-aa9b-cf403ef39ed7
 - Spec 📋: https://claude.ai/code/artifact/db2a2f5b-7e27-44db-8bf3-723e32fca327
-- Old work-account copies (deprecated 2026-07-16, do not update):
-  app 90920e4c-d0a6-4309-8cad-d868b7860463, spec 43da555f-6a93-41c1-9a30-edc9a77ff019
+- Old/broken URLs (do not use):
+  - App, original personal-account copy (published 2026-07-16, broken as of
+    2026-08-04 - every publish attempt fails with "could not verify the target
+    page is not a review page," confirmed via A/B testing with byte-identical
+    content that publishes fine elsewhere; likely a stuck/corrupted artifact on
+    Anthropic's backend, not a content or session issue):
+    de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
+  - Old work-account copies (deprecated 2026-07-16): app
+    90920e4c-d0a6-4309-8cad-d868b7860463, spec 43da555f-6a93-41c1-9a30-edc9a77ff019
 
 ## Logging procedure (every time Kirk reports something)
 

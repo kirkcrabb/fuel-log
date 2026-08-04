@@ -4,7 +4,7 @@ A personal food, exercise, and weight tracker that runs as a private Claude arti
 This document is the living spec: it is updated every time a change is requested,
 and the changelog at the bottom records each revision.
 
-**Live app:** https://claude.ai/code/artifact/de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
+**Live app:** https://claude.ai/code/artifact/6016fa31-707b-42fa-aa9b-cf403ef39ed7
 
 ---
 
@@ -136,6 +136,14 @@ round-trip per item.
 ---
 
 ## Changelog
+
+### v2.18 — 2026-08-04
+- **Migrated the app artifact to a new URL** after the original personal-account
+  artifact (de2ff8ee...) got permanently stuck - every publish attempt failed with
+  "could not verify the target page is not a review page," confirmed via A/B testing
+  (byte-identical content published successfully as a new artifact, failed every time
+  to the old URL). No data was lost; the new artifact was seeded with the complete,
+  up-to-date `DATA` block. See CLAUDE.md Artifacts section for the new URL.
 
 ### v2.17 — 2026-07-28
 - **Codified pick rotation in CLAUDE.md** at Kirk's request, after noticing next-meal
