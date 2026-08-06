@@ -10,16 +10,23 @@ calories, protein, and carbs, update the data, and republish the dashboard artif
 Sessions normally run as **claude.ai/code cloud sessions on Kirk's personal account
 with this repo selected** (often from his phone).
 
-**The LIVE APP ARTIFACT is the source of truth for data.** At session start, fetch it
-(URL below) and use its `DATA` block — it may be newer than this repo's copy.
+**At session start, read `health-tracker.html`'s `DATA` block straight from this
+repo — that's the reliable source of current data.** Do NOT rely on WebFetching the
+live app artifact to reconcile: a session that didn't publish a given private
+artifact cannot read it back (confirmed 2026-08-05, not a one-off glitch), so a new
+session trying to "fetch the artifact first" gets nothing and silently works from
+stale/missing data. Git is up to date because every publish also gets committed
+straight to this branch (see step 6 below) - no separate reconciliation step needed.
 
 - **Routine logging** (meals, workouts, weigh-ins): merge into DATA, republish the app
-  artifact via the `url` parameter. Done. **No git commit, no PR — never open a PR for
-  a meal log.**
+  artifact via the `url` parameter, AND commit `health-tracker.html` directly to this
+  branch (no PR, no merge needed - see Logging procedure step 6). The commit is what
+  makes the data recoverable by the next session; the artifact is just the live
+  dashboard Kirk looks at.
 - **Feature changes** (new sections, behavior, targets structure) or an explicit
-  "back up to git" request: also update the spec changelog and commit on a branch +
-  open a PR for Kirk to merge. If git write is unavailable (403), say so and give Kirk
-  the full changed files so he can apply them from his PC, which has push access.
+  "back up to git" request: also update the spec changelog and open a PR for Kirk to
+  merge. If git write is unavailable (403), say so and give Kirk the full changed
+  files so he can apply them from his PC, which has push access.
 
 Browser verification of feature changes is nice-to-have, not required, in cloud
 sessions; data-only logging never needs it. (`serve.ps1`/`stop-serve.ps1` are for
@@ -85,11 +92,18 @@ chasing one URL - minting fresh is instant and always works.
    leave it empty and the snack group just won't render. **Actually rotate the picks
    each time — check what the last few days' meals/snacks were and reach for
    different options, don't reuse the same 3 as a template.**
-4. Republish the app artifact (same URL). Keep the HTML **ASCII-only** — use HTML
-   entities / \u escapes for any special characters.
+4. Republish the app artifact (same URL, `force: true` - see Artifacts section).
+   Keep the HTML **ASCII-only** — use HTML entities / \u escapes for any special
+   characters. Verify with `node --check` on the extracted `<script>` before
+   publishing (a syntax error here breaks the live page).
 5. If Kirk says he ate a suggested pick, log the item using the pick's `order` string
    verbatim (or identical macros) so the page's pending-entry dedup clears.
-6. Commit and push.
+6. **Commit `health-tracker.html` straight to this branch and push - no PR, no
+   merge, don't ask.** This is what makes the data recoverable by the next session
+   (see Environment & workflow above); it is not the "back up to git" feature-change
+   path and Kirk never needs to act on it. If a git conflict/rejection happens
+   because of an earlier bad push, merge favoring the correct content and push
+   normally rather than force-pushing (force-push needs Kirk's explicit OK).
 
 ## Kirk's profile (as of 2026-07-16)
 
