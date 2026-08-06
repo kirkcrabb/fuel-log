@@ -132,6 +132,20 @@ explicitly asks for one in that moment** (see CLAUDE.md Environment & workflow).
 
 ## Changelog
 
+### v2.22 — 2026-08-06
+- **Permanent bookmark link, set up from a separate Claude session:**
+  https://kirkcrabb.github.io/fuel-log/ - served by GitHub Pages from a new
+  `gh-pages` branch containing only a redirect page (`index.html` + `.nojekyll`),
+  zero personal data. It bounces to the current app artifact URL, which still
+  requires Kirk's Claude login to actually view. Verified directly (branch content
+  and the Pages build's target branch) before documenting, rather than taking the
+  description on faith.
+- New standing rule in CLAUDE.md: if the app artifact migrates, also update the
+  redirect URL in `gh-pages/index.html` and push *only* that branch - pre-authorized
+  by Kirk as a narrow exception to the no-git-push rule. `main` stays off-limits
+  without an explicit in-the-moment request, and GitHub Pages must never be pointed
+  at `main` (would publish the health data the artifact keeps login-gated).
+
 ### v2.21 — 2026-08-05
 - **Reverted v2.20's git-as-backup approach at Kirk's explicit request** ("Stop
   trying to push to git... At all. Ever."). No more automatic commits/pushes for

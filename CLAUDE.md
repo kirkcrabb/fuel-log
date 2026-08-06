@@ -47,6 +47,19 @@ ALWAYS republish to these URLs via the Artifact tool's `url` parameter, and try
 
 - App 🌿 (SOURCE OF TRUTH, migrated 2026-08-05): https://claude.ai/code/artifact/2502cec8-4fd4-4e06-b1f5-7872ad867da0
 - Spec 📋 (migrated 2026-08-05): https://claude.ai/code/artifact/efa9cdcf-e6a0-40bf-b162-b60d680bf9b2
+- **Stable bookmark (added 2026-08-06):** https://kirkcrabb.github.io/fuel-log/ -
+  a permanent link that never changes, served by GitHub Pages from the `gh-pages`
+  branch (NOT `main`). That branch contains only a redirect page (`index.html`, plus
+  `.nojekyll`) with zero personal data - it just bounces to the current app artifact
+  URL above. **If the app artifact ever migrates, also update the URL in
+  `gh-pages/index.html` (appears 3 places: the HTML comment, the `<meta refresh>`,
+  and the fallback link/redirect script) and commit + push ONLY the `gh-pages`
+  branch.** Kirk pre-authorized these pointer-only pushes (2026-08-06) as a narrow
+  exception to the no-git-push rule above - `main` is still completely off-limits
+  without an explicit in-the-moment request. **GitHub Pages must never be
+  reconfigured to serve from `main`** - that would publish Kirk's health data
+  publicly (repo visibility is public; only the branch Pages serves from keeps data
+  private).
 - Old/broken URLs (do not use - permanently stuck, unfixable even with
   `force: true`, confirmed via A/B testing with byte-identical content that
   publishes fine elsewhere):
