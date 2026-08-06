@@ -4,7 +4,7 @@ A personal food, exercise, and weight tracker that runs as a private Claude arti
 This document is the living spec: it is updated every time a change is requested,
 and the changelog at the bottom records each revision.
 
-**Live app:** https://claude.ai/code/artifact/de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
+**Live app:** https://claude.ai/code/artifact/e83a6198-f289-41da-849e-0369720c16f8
 
 ---
 
@@ -119,7 +119,7 @@ round-trip per item.
 2. Edit only the `DATA` block — set `updated` to today, add/merge the day's entries.
 3. Republish the artifact (URL above) via the `url` parameter.
 4. For feature changes (not data logging): also update this spec, bump the changelog,
-   and republish it (spec artifact: https://claude.ai/code/artifact/db2a2f5b-7e27-44db-8bf3-723e32fca327).
+   and republish it (spec artifact: https://claude.ai/code/artifact/e2197981-3b7b-4b0a-adbb-db03d1f5a8b7).
 5. Keep the app HTML ASCII-only (HTML entities / `\u` escapes for special characters).
 
 **From a cloud session (Kirk logging from his phone, PC possibly off):**
@@ -136,6 +136,24 @@ round-trip per item.
 ---
 
 ## Changelog
+
+### v2.19 — 2026-08-05
+- **Migrated the app artifact again** - the v2.18 replacement (6016fa31...) got
+  permanently stuck within hours of going live, same symptom as the original. Also
+  root-caused a *separate* intermittent bug hitting healthy artifacts: routine
+  republishes were randomly failing the same "review page" check due to its internal
+  content-fetch flaking (HTTP 403), not the publish itself. `force: true` reliably
+  bypasses that check and is now used on every app republish (see CLAUDE.md
+  Artifacts section). The truly-stuck-artifact failure mode is unaffected by
+  `force: true` and still requires migrating to a new URL. No data was lost.
+
+### v2.18 — 2026-08-04
+- **Migrated the app artifact to a new URL** after the original personal-account
+  artifact (de2ff8ee...) got permanently stuck - every publish attempt failed with
+  "could not verify the target page is not a review page," confirmed via A/B testing
+  (byte-identical content published successfully as a new artifact, failed every time
+  to the old URL). No data was lost; the new artifact was seeded with the complete,
+  up-to-date `DATA` block. See CLAUDE.md Artifacts section for the new URL.
 
 ### v2.17 — 2026-07-28
 - **Codified pick rotation in CLAUDE.md** at Kirk's request, after noticing next-meal

@@ -353,20 +353,128 @@
 <script>
 // ===== DATA (maintained by Claude - edit only this block, then republish) =====
 const DATA = {
-  updated: "2026-07-25",
+  updated: "2026-08-05",
   weightUnit: "lbs",
   targets: { cal: 2100, protein: 150, carbs: 40 },
   goalWeight: 220,
   nextMeal: {
-    context: "breakfast tomorrow (Sun, unstructured)",
+    context: "dinner (Wed, BYU commute + dispatch shift)",
     meals: [
-      { place: "Home", order: "Turkey + pepper jack roll-ups (4 roll-ups: 1 turkey slice + 1 cheese slice each, no bread)", cal: 320, protein: 36, carbs: 4, note: "Zero-effort, zero-cook." },
-      { place: "Home", order: "Hard-boiled eggs (3)", cal: 210, protein: 18, carbs: 2, note: "Make a batch ahead so it's grab-and-go." },
-      { place: "Home", order: "Fairlife Core Power Elite shake", cal: 230, protein: 42, carbs: 9, note: "Straight from the fridge, no prep at all." }
+      { place: "Cafe Rio (Provo)", order: "Salad bowl, no rice/beans/tortilla, double chicken or steak, light cheese, mild salsa, dressing on the side", cal: 480, protein: 50, carbs: 8, note: "Skip the corn-tomato salsa, it's the carb trap." },
+      { place: "Mo' Bettahs (Provo)", order: "2-scoop plate, grilled chicken or kalbi steak, no rice or mac salad - sub extra cabbage, sauce on the side", cal: 460, protein: 45, carbs: 10, note: "Rice + mac salad are the default sides - ask to swap both out." },
+      { place: "Costa Vida (Provo)", order: "Salad, no rice/beans/tortilla, double steak or chicken, light cheese, vinaigrette on the side", cal: 500, protein: 50, carbs: 10, note: "Same build that's worked well before - easy order." }
     ],
-    snacks: []
+    snacks: [
+      { place: "Tillamook Zero Sugar jerky", order: "2.2 oz package", cal: 140, protein: 28, carbs: 0, note: "Packs flat for the shift bag." },
+      { place: "Pro2Go Protein Pack", order: "Hard-boiled egg + Genoa salami + pepper jack stick", cal: 260, protein: 18, carbs: 0, note: "Zero carb, grab-and-go." },
+      { place: "Jerky + Core Power Elite shake combo", order: "Tillamook jerky + a Core Power Elite shake", cal: 370, protein: 70, carbs: 10, note: "Biggest of the three if you need more staying power for the late shift." }
+    ]
   },
   days: {
+    "2026-08-05": {
+      weight: 280.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 376 }
+      ],
+      food: [
+        { item: "Green salad: grilled chicken, cheese, egg, sunflower seeds, light oil & vinegar", meal: "lunch", cal: 510, protein: 52, carbs: 9 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-08-04": {
+      weight: 281.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 400 }
+      ],
+      food: [
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "breakfast", cal: 230, protein: 42, carbs: 9 },
+        { item: "Pepper jack cheese slices (5)", meal: "lunch", cal: 500, protein: 35, carbs: 2 },
+        { item: "Deli turkey slices (10, cheap brand)", meal: "lunch", cal: 280, protein: 45, carbs: 8 },
+        { item: "Fairlife Core Power Elite, chocolate (42g)", meal: "dinner", cal: 230, protein: 42, carbs: 8 },
+        { item: "Whole rotisserie chicken, garlic herb (Smith's, 2 lb package), entire bird - meat & skin", meal: "dinner", cal: 1650, protein: 175, carbs: 8 }
+      ]
+    },
+    "2026-08-03": {
+      weight: 282.5,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 362 }
+      ],
+      food: [
+        { item: "Hard-boiled eggs (3)", meal: "breakfast", cal: 210, protein: 18, carbs: 2 },
+        { item: "Ribs (3), dry rub", meal: "dinner - BBQ", cal: 810, protein: 54, carbs: 2 },
+        { item: "Brisket (1/2 lb)", meal: "dinner - BBQ", cal: 670, protein: 58, carbs: 0 }
+      ]
+    },
+    "2026-08-01": {
+      food: [
+        { item: "Sausage links (3)", meal: "breakfast", cal: 270, protein: 15, carbs: 3 },
+        { item: "Eggs, over easy (2)", meal: "breakfast", cal: 180, protein: 12, carbs: 1 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "breakfast", cal: 230, protein: 42, carbs: 9 },
+        { item: "Cobb salad, grilled chicken (no dressing specified)", meal: "lunch - Chick-fil-A", cal: 510, protein: 40, carbs: 20 },
+        { item: "Peach (medium)", meal: "snack", cal: 60, protein: 1, carbs: 15 }
+      ]
+    },
+    "2026-07-31": {
+      weight: 281.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 342 }
+      ],
+      food: [
+        { item: "House salad, ranch (2 oz), double chicken", meal: "lunch - Slackwater", cal: 565, protein: 65, carbs: 8 }
+      ]
+    },
+    "2026-07-30": {
+      exercise: [
+        { name: "Treadmill walk", minutes: 30, cal: 336 }
+      ],
+      food: [
+        { item: "Small salad: greens, broccoli, cheese, chicken, eggs, sunflower seeds, blue cheese (1 x 2 oz cup)", meal: "lunch", cal: 740, protein: 49, carbs: 15 },
+        { item: "Colby Jack Cheesewich (cheese and meat snack, 2 packages)", meal: "snack", cal: 540, protein: 32, carbs: 4 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-07-29": {
+      weight: 280.6,
+      exercise: [
+        { name: "Stationary bike", minutes: 60, cal: 749 }
+      ],
+      food: [
+        { item: "Super Sub, in a bowl, extra meat", meal: "Jersey Mike's, no bread - per app nutrition calculator", cal: 610, protein: 40, carbs: 14 },
+        { item: "Wingstop bone-in wings (15-ct), Louisiana Rub", meal: "dinner", cal: 1125, protein: 98, carbs: 3 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "dinner", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-07-28": {
+      weight: 280.9,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 433 }
+      ],
+      food: [
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "breakfast", cal: 230, protein: 42, carbs: 9 },
+        { item: "Pro2Go Protein Pack (hard-boiled egg, 9 Genoa salami slices, pepper jack cheese stick)", meal: "breakfast", cal: 260, protein: 18, carbs: 0 },
+        { item: "Big salad (half eaten): greens, radishes, chicken, cheese, broccoli, sunflower seeds, blue cheese (2 x 2 oz cups)", meal: "lunch", cal: 510, protein: 27, carbs: 12 },
+        { item: "Side salad with ranch, topped with grilled nuggets (8-ct)", meal: "dinner - Chick-fil-A", cal: 480, protein: 33, carbs: 15 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-07-27": {
+      weight: 284,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 516 }
+      ],
+      food: [
+        { item: "Hard-boiled eggs (2)", meal: "breakfast", cal: 140, protein: 12, carbs: 1 },
+        { item: "Bone-in wings (15-ct), Buffalo Wild Wings, Buffalo dry rub, no dip", meal: "lunch", cal: 1125, protein: 98, carbs: 4 },
+        { item: "Fairlife Core Power Elite shake, made in Ninja Creami", meal: "dessert", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-07-26": {
+      food: [
+        { item: "Jersey Mike's #8 Club Sub, extra meat/cheese, mayo, oil & vinegar, in a wrap (not lettuce)", meal: "lunch", cal: 1300, protein: 73, carbs: 58 },
+        { item: "Ribeye (10.5 oz, 3/4 of 14 oz)", meal: "dinner - Texas Roadhouse", cal: 890, protein: 68, carbs: 0 },
+        { item: "Side salad (half) with ranch (half serving)", meal: "dinner - Texas Roadhouse", cal: 175, protein: 2, carbs: 5 }
+      ]
+    },
     "2026-07-25": {
       food: [
         { item: "Blue bacon cheeseburger (half, with bun)", meal: "lunch", cal: 400, protein: 20, carbs: 25 },

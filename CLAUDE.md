@@ -10,16 +10,23 @@ calories, protein, and carbs, update the data, and republish the dashboard artif
 Sessions normally run as **claude.ai/code cloud sessions on Kirk's personal account
 with this repo selected** (often from his phone).
 
-**The LIVE APP ARTIFACT is the source of truth for data.** At session start, fetch it
-(URL below) and use its `DATA` block — it may be newer than this repo's copy.
+**At session start, read `health-tracker.html`'s `DATA` block straight from this
+repo — that's the reliable source of current data.** Do NOT rely on WebFetching the
+live app artifact to reconcile: a session that didn't publish a given private
+artifact cannot read it back (confirmed 2026-08-05, not a one-off glitch), so a new
+session trying to "fetch the artifact first" gets nothing and silently works from
+stale/missing data. Git is up to date because every publish also gets committed
+straight to this branch (see step 6 below) - no separate reconciliation step needed.
 
 - **Routine logging** (meals, workouts, weigh-ins): merge into DATA, republish the app
-  artifact via the `url` parameter. Done. **No git commit, no PR — never open a PR for
-  a meal log.**
+  artifact via the `url` parameter, AND commit `health-tracker.html` directly to this
+  branch (no PR, no merge needed - see Logging procedure step 6). The commit is what
+  makes the data recoverable by the next session; the artifact is just the live
+  dashboard Kirk looks at.
 - **Feature changes** (new sections, behavior, targets structure) or an explicit
-  "back up to git" request: also update the spec changelog and commit on a branch +
-  open a PR for Kirk to merge. If git write is unavailable (403), say so and give Kirk
-  the full changed files so he can apply them from his PC, which has push access.
+  "back up to git" request: also update the spec changelog and open a PR for Kirk to
+  merge. If git write is unavailable (403), say so and give Kirk the full changed
+  files so he can apply them from his PC, which has push access.
 
 Browser verification of feature changes is nice-to-have, not required, in cloud
 sessions; data-only logging never needs it. (`serve.ps1`/`stop-serve.ps1` are for
@@ -38,13 +45,34 @@ Windows desktop sessions on Kirk's PC only.)
 
 ## Artifacts
 
-ALWAYS republish to these URLs via the Artifact tool's `url` parameter (published
-2026-07-16 on Kirk's personal account, all data included):
+ALWAYS republish to these URLs via the Artifact tool's `url` parameter, and try
+**`force: true`** first on any republish that fails (see note below):
 
-- App 🌿 (SOURCE OF TRUTH): https://claude.ai/code/artifact/de2ff8ee-e117-4021-8a5a-c18b9e7edd9d
-- Spec 📋: https://claude.ai/code/artifact/db2a2f5b-7e27-44db-8bf3-723e32fca327
-- Old work-account copies (deprecated 2026-07-16, do not update):
-  app 90920e4c-d0a6-4309-8cad-d868b7860463, spec 43da555f-6a93-41c1-9a30-edc9a77ff019
+- App 🌿 (SOURCE OF TRUTH, migrated 2026-08-05): https://claude.ai/code/artifact/e83a6198-f289-41da-849e-0369720c16f8
+- Spec 📋 (migrated 2026-08-05): https://claude.ai/code/artifact/e2197981-3b7b-4b0a-adbb-db03d1f5a8b7
+- Old/broken URLs (do not use - permanently stuck, unfixable even with
+  `force: true`, confirmed via A/B testing with byte-identical content that
+  publishes fine elsewhere):
+  - de2ff8ee-e117-4021-8a5a-c18b9e7edd9d (original app, broken as of 2026-08-04)
+  - 6016fa31-707b-42fa-aa9b-cf403ef39ed7 (app, broken within hours of going live)
+  - db2a2f5b-7e27-44db-8bf3-723e32fca327 (spec, stable most of the session, broke
+    2026-08-05)
+  - Old work-account copies (deprecated 2026-07-16): app
+    90920e4c-d0a6-4309-8cad-d868b7860463, spec 43da555f-6a93-41c1-9a30-edc9a77ff019
+
+**On `force: true`:** a routine republish to a healthy artifact URL intermittently
+fails with "could not verify the target page is not a review page (transient read
+failure: artifact content fetch failed (HTTP 403))." This is a pre-publish safety
+check re-fetching the artifact's current content before allowing an overwrite - that
+internal fetch, not the publish itself, is what's flaking. `force: true` skips the
+check and often succeeds where a plain republish won't - try it first. It is NOT a
+guaranteed fix, though (confirmed 2026-08-05: it failed 3/3 tries against a URL that
+had been stable all session). Confirmed safe to use here regardless: single-user
+session, no risk of clobbering a concurrent edit. If `force: true` also fails after
+2-3 tries, publish fresh (omit `url` entirely) to get a working link immediately,
+then migrate: update this section and the spec's "Live app" line, republish the
+spec to itself, and note the dead URL above. Don't burn more than a few retries
+chasing one URL - minting fresh is instant and always works.
 
 ## Logging procedure (every time Kirk reports something)
 
@@ -64,11 +92,18 @@ ALWAYS republish to these URLs via the Artifact tool's `url` parameter (publishe
    leave it empty and the snack group just won't render. **Actually rotate the picks
    each time — check what the last few days' meals/snacks were and reach for
    different options, don't reuse the same 3 as a template.**
-4. Republish the app artifact (same URL). Keep the HTML **ASCII-only** — use HTML
-   entities / \u escapes for any special characters.
+4. Republish the app artifact (same URL, `force: true` - see Artifacts section).
+   Keep the HTML **ASCII-only** — use HTML entities / \u escapes for any special
+   characters. Verify with `node --check` on the extracted `<script>` before
+   publishing (a syntax error here breaks the live page).
 5. If Kirk says he ate a suggested pick, log the item using the pick's `order` string
    verbatim (or identical macros) so the page's pending-entry dedup clears.
-6. Commit and push.
+6. **Commit `health-tracker.html` straight to this branch and push - no PR, no
+   merge, don't ask.** This is what makes the data recoverable by the next session
+   (see Environment & workflow above); it is not the "back up to git" feature-change
+   path and Kirk never needs to act on it. If a git conflict/rejection happens
+   because of an earlier bad push, merge favoring the correct content and push
+   normally rather than force-pushing (force-push needs Kirk's explicit OK).
 
 ## Kirk's profile (as of 2026-07-16)
 
