@@ -1,0 +1,78 @@
+{
+  "exportedAt": "2026-07-19",
+  "weightUnit": "lbs",
+  "targets": { "cal": 2100, "protein": 150, "carbs": 40 },
+  "goalWeight": 220,
+  "days": {
+    "2026-07-19": {
+      "food": [
+        { "item": "Hard-boiled eggs (2)", "meal": "breakfast", "cal": 140, "protein": 12, "carbs": 1 },
+        { "item": "Muscle Milk Pro Series shake", "meal": "breakfast", "cal": 240, "protein": 42, "carbs": 14 }
+      ]
+    },
+    "2026-07-18": {
+      "weight": 286.6,
+      "exercise": [
+        { "name": "Stationary bike", "minutes": 30, "cal": 265 }
+      ],
+      "food": [
+        { "item": "Double steak, fajita veggies, guac, cheese (bowl, no rice/beans)", "meal": "Chipotle", "cal": 680, "protein": 73, "carbs": 13 },
+        { "item": "Pho, beef (all the meat, partial broth) + ~1 cup rice noodles", "meal": "dinner", "cal": 470, "protein": 37, "carbs": 49 }
+      ]
+    },
+    "2026-07-17": {
+      "weight": 287.3,
+      "exercise": [
+        { "name": "Stationary bike (7.25 mi)", "minutes": 30, "cal": 454 }
+      ],
+      "food": [
+        { "item": "Original Italian, in a bowl, Mike's Way", "meal": "Jersey Mike's, no bread", "cal": 520, "protein": 28, "carbs": 12 },
+        { "item": "Fairlife Core Power Elite, strawberry (42g)", "meal": "snack", "cal": 230, "protein": 42, "carbs": 9 },
+        { "item": "Bisteck a la Carreta (steak)", "meal": "dinner - La Carreta, Peruvian", "cal": 450, "protein": 42, "carbs": 4 },
+        { "item": "House salad", "meal": "dinner - La Carreta", "cal": 120, "protein": 2, "carbs": 8 },
+        { "item": "Cooked rice (1 cup)", "meal": "dinner - La Carreta", "cal": 205, "protein": 4, "carbs": 45 },
+        { "item": "Low-carb pint ice cream, whole container", "meal": "dessert - label: 630 cal, 55g total carb, 8g fiber, 42g sugar alcohol, 8g protein; net carbs shown", "cal": 630, "protein": 8, "carbs": 5 }
+      ]
+    },
+    "2026-07-16": {
+      "weight": 288.8,
+      "exercise": [
+        { "name": "Stationary bike", "minutes": 30, "cal": 280 },
+        { "name": "Walk (0.89 mi)", "minutes": 24.6, "cal": 174 }
+      ],
+      "food": [
+        { "item": "Grilled chicken salad, oil & vinegar", "meal": "lunch - greens, spinach, eggs, cucumber, cheese, broccoli, mushrooms, extra sunflower seeds", "cal": 820, "protein": 62, "carbs": 18 },
+        { "item": "Tri-tip salad with vinaigrette", "meal": "dinner - Cubby's", "cal": 550, "protein": 45, "carbs": 15 },
+        { "item": "Core Power Elite shake only", "meal": "shift snack", "cal": 230, "protein": 42, "carbs": 9 }
+      ]
+    },
+    "2026-07-15": {
+      "weight": 289.9,
+      "exercise": [
+        { "name": "Stationary bike", "minutes": 30, "cal": 280 },
+        { "name": "Walk (outside, hot)", "minutes": 25, "cal": 185 }
+      ],
+      "food": [
+        { "item": "Fairlife Core Power Elite, strawberry (42g)", "meal": "breakfast", "cal": 230, "protein": 42, "carbs": 9 },
+        { "item": "Hard-boiled eggs (2)", "meal": "breakfast", "cal": 140, "protein": 12, "carbs": 1 },
+        { "item": "Grilled chicken salad, oil & vinegar", "meal": "lunch - mixed greens, broccoli, cucumber, cheese, hard-boiled eggs, sunflower seeds", "cal": 700, "protein": 58, "carbs": 13 },
+        { "item": "Grilled nuggets (8-ct) on side salad", "meal": "dinner - Chick-fil-A", "cal": 290, "protein": 30, "carbs": 10 },
+        { "item": "Garden Herb Ranch dressing", "meal": "dinner - Chick-fil-A", "cal": 280, "protein": 1, "carbs": 2 },
+        { "item": "Tillamook Zero Sugar black pepper jerky (2.2 oz pkg)", "meal": "shift snack", "cal": 140, "protein": 28, "carbs": 0 }
+      ]
+    },
+    "2026-07-14": {
+      "weight": 291,
+      "exercise": [
+        { "name": "Stationary bike", "minutes": 30, "cal": 280 }
+      ],
+      "food": [
+        { "item": "Grilled chicken salad", "meal": "mixed greens, spinach, peas, pickled beets, broccoli, cheese", "cal": 415, "protein": 48, "carbs": 26 },
+        { "item": "Blue cheese dressing (2 x 2 oz cups)", "meal": null, "cal": 580, "protein": 4, "carbs": 8 },
+        { "item": "Grilled chicken sandwich, no bun", "meal": "dinner - Chick-fil-A", "cal": 200, "protein": 26, "carbs": 8 },
+        { "item": "Kale Crunch side", "meal": "dinner - Chick-fil-A", "cal": 120, "protein": 3, "carbs": 8 },
+        { "item": "Ranch sauce", "meal": "dinner - Chick-fil-A", "cal": 140, "protein": 1, "carbs": 2 }
+      ]
+    }
+  }
+}
