@@ -4,7 +4,7 @@ A personal food, exercise, and weight tracker that runs as a private Claude arti
 This document is the living spec: it is updated every time a change is requested,
 and the changelog at the bottom records each revision.
 
-**Live app:** https://claude.ai/code/artifact/e83a6198-f289-41da-849e-0369720c16f8
+**Live app:** https://claude.ai/code/artifact/2502cec8-4fd4-4e06-b1f5-7872ad867da0
 
 ---
 
@@ -19,8 +19,11 @@ Logging happens **in chat with Claude**, not in the page:
 3. Claude updates the data block inside the app's HTML and republishes the artifact.
    The page is a read-only dashboard of Claude-maintained data.
 
-Source of truth lives on Kirk's machine at `C:\Users\kcrabb\Documents\daybook-health\health-tracker.html`
-(the `const DATA = {...}` block near the top of the script). No localStorage, no network calls.
+Source of truth is the `main` branch of the `kirkcrabb/fuel-log` GitHub repo (the
+`const DATA = {...}` block near the top of `health-tracker.html`'s script) - not the
+artifact link, which can go stale (see Environment & workflow in CLAUDE.md). Kirk's
+local clone lives at `C:\Users\kcrabb\Downloads\fuel-log\`. No localStorage, no
+network calls from the page itself.
 
 ## What's tracked
 
@@ -111,31 +114,52 @@ round-trip per item.
 
 ## Update procedure (for Claude)
 
-**On Kirk's PC (normal case):**
-1. First, reconcile: WebFetch the live app artifact (URL above) and compare its `DATA`
-   block against the local file — a phone/cloud session may have logged entries the
-   local file doesn't have. Merge the newer entries into
-   `C:\Users\kcrabb\Documents\daybook-health\health-tracker.html`.
-2. Edit only the `DATA` block — set `updated` to today, add/merge the day's entries.
-3. Republish the artifact (URL above) via the `url` parameter.
-4. For feature changes (not data logging): also update this spec, bump the changelog,
-   and republish it (spec artifact: https://claude.ai/code/artifact/e2197981-3b7b-4b0a-adbb-db03d1f5a8b7).
-5. Keep the app HTML ASCII-only (HTML entities / `\u` escapes for special characters).
+Same procedure regardless of whether the session is on Kirk's PC (`git pull` first
+if the local clone at `C:\Users\kcrabb\Downloads\fuel-log\` might be behind) or a
+cloud session (repo is fetched fresh automatically) - **do NOT WebFetch the live
+artifact to reconcile** (confirmed 2026-08-05: a session that didn't publish a given
+private artifact can't read it back, so this silently loses data instead of finding
+it). `health-tracker.html` on `main` is always current because every publish also
+commits straight to this branch.
 
-**From a cloud session (Kirk logging from his phone, PC possibly off):**
-1. Kirk reports food, exercise, or a weigh-in. Estimate calories/protein/carbs per item
-   (macro estimates, clearly stated).
-2. WebFetch the live app artifact (URL above) to get the current page HTML — the
-   artifact is the source of truth in this mode.
-3. Save the HTML to a local file, merge the new entries into the `DATA` block only
-   (shape documented above; set `updated` to today), change nothing else.
-4. Republish with the Artifact tool passing `url:` the app artifact URL.
-5. Do not touch targets, picks, or layout unless Kirk asks. The next PC session will
-   reconcile automatically (see above).
+1. Read `health-tracker.html`'s `DATA` block directly from the repo.
+2. Edit only the `DATA` block — set `updated` to today, add/merge the day's entries.
+3. Republish the artifact (URL above) via the `url` parameter, with `force: true`
+   (see CLAUDE.md Artifacts section for why, and the fallback if it still fails).
+4. Commit `health-tracker.html` straight to `main` and push - no PR, no merge, don't
+   ask Kirk (see CLAUDE.md Logging procedure). This is what makes the data
+   recoverable by the next session regardless of artifact-link health.
+5. For feature changes (not data logging): also update this spec, bump the
+   changelog, and republish it (spec artifact URL above).
+6. Keep the app HTML ASCII-only (HTML entities / `\u` escapes for special characters),
+   verified with `node --check` before publishing.
 
 ---
 
 ## Changelog
+
+### v2.20 — 2026-08-05
+- **Git (not the artifact) is now the documented recoverable source of truth.** A
+  fresh session tried to reconcile via WebFetching the live artifact per the old
+  procedure and got nothing - a session that didn't publish a given private artifact
+  can't read it back, confirmed not a one-off glitch. Routine logging now commits
+  `health-tracker.html` straight to `main` on every publish (no PR, no merge, nothing
+  for Kirk to act on), so any session can recover current data straight from the repo.
+  The "Update procedure" section was rewritten to a single git-first flow instead of
+  the old PC-vs-cloud split that both leaned on WebFetch.
+- Also caught and fixed: the CLAUDE.md fix above had been sitting on an unmerged PR
+  for hours while a separate fresh session kept hitting `main`'s stale copy - merged
+  it. And an accidental placeholder push briefly replaced `health-tracker.html` with
+  one line on GitHub; caught within minutes and corrected via a merge favoring the
+  real content (not a force-push) - no data was actually lost from `DATA` itself.
+- Repo is now public at Kirk's choice (was private) after ruling out GitHub Pages as
+  a way to get a permanently stable dashboard link - GitHub's Pages build
+  infrastructure itself was stuck/failing that night, unrelated to this repo's
+  config, so that attempt was shelved. Live app link still occasionally changes when
+  the Claude artifact backend hiccups; git is the durability layer, not the artifact.
+- Kirk's local clone now lives at `C:\Users\kcrabb\Downloads\fuel-log\` (was
+  `C:\Users\kcrabb\Documents\daybook-health\`, never actually re-created after the
+  July migration to this repo).
 
 ### v2.19 — 2026-08-05
 - **Migrated the app artifact again** - the v2.18 replacement (6016fa31...) got

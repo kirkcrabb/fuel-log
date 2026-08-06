@@ -48,13 +48,16 @@ Windows desktop sessions on Kirk's PC only.)
 ALWAYS republish to these URLs via the Artifact tool's `url` parameter, and try
 **`force: true`** first on any republish that fails (see note below):
 
-- App 🌿 (SOURCE OF TRUTH, migrated 2026-08-05): https://claude.ai/code/artifact/e83a6198-f289-41da-849e-0369720c16f8
-- Spec 📋 (migrated 2026-08-05): https://claude.ai/code/artifact/e2197981-3b7b-4b0a-adbb-db03d1f5a8b7
+- App 🌿 (SOURCE OF TRUTH, migrated 2026-08-05): https://claude.ai/code/artifact/2502cec8-4fd4-4e06-b1f5-7872ad867da0
+- Spec 📋 (migrated 2026-08-05): https://claude.ai/code/artifact/efa9cdcf-e6a0-40bf-b162-b60d680bf9b2
 - Old/broken URLs (do not use - permanently stuck, unfixable even with
   `force: true`, confirmed via A/B testing with byte-identical content that
   publishes fine elsewhere):
   - de2ff8ee-e117-4021-8a5a-c18b9e7edd9d (original app, broken as of 2026-08-04)
   - 6016fa31-707b-42fa-aa9b-cf403ef39ed7 (app, broken within hours of going live)
+  - e83a6198-f289-41da-849e-0369720c16f8 (app, broken within an hour of going live)
+  - d75bbb35-f224-4177-a6c3-3c398db4bda8, d258eb4d-7918-41ab-ae42-e56734e17b4a (app,
+    same-night throwaway links from the 2026-08-05 instability, both dead)
   - db2a2f5b-7e27-44db-8bf3-723e32fca327 (spec, stable most of the session, broke
     2026-08-05)
   - Old work-account copies (deprecated 2026-07-16): app
