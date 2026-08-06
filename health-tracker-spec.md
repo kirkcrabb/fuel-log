@@ -19,11 +19,11 @@ Logging happens **in chat with Claude**, not in the page:
 3. Claude updates the data block inside the app's HTML and republishes the artifact.
    The page is a read-only dashboard of Claude-maintained data.
 
-Source of truth is the `main` branch of the `kirkcrabb/fuel-log` GitHub repo (the
-`const DATA = {...}` block near the top of `health-tracker.html`'s script) - not the
-artifact link, which can go stale (see Environment & workflow in CLAUDE.md). Kirk's
-local clone lives at `C:\Users\kcrabb\Downloads\fuel-log\`. No localStorage, no
-network calls from the page itself.
+Source of truth is Kirk's local copy at `C:\Users\kcrabb\Downloads\fuel-log\
+health-tracker.html` (the `const DATA = {...}` block near the top of the script).
+No git commits/pushes for this, ever, unless Kirk explicitly asks in the moment -
+see Environment & workflow in CLAUDE.md. No localStorage, no network calls from the
+page itself.
 
 ## What's tracked
 
@@ -114,29 +114,31 @@ round-trip per item.
 
 ## Update procedure (for Claude)
 
-Same procedure regardless of whether the session is on Kirk's PC (`git pull` first
-if the local clone at `C:\Users\kcrabb\Downloads\fuel-log\` might be behind) or a
-cloud session (repo is fetched fresh automatically) - **do NOT WebFetch the live
-artifact to reconcile** (confirmed 2026-08-05: a session that didn't publish a given
-private artifact can't read it back, so this silently loses data instead of finding
-it). `health-tracker.html` on `main` is always current because every publish also
-commits straight to this branch.
+Kirk primarily works from his PC now, with `health-tracker.html` at
+`C:\Users\kcrabb\Downloads\fuel-log\` as the working copy to edit directly.
+**No git commit or push for any of this - not even to `main` - unless Kirk
+explicitly asks for one in that moment** (see CLAUDE.md Environment & workflow).
 
-1. Read `health-tracker.html`'s `DATA` block directly from the repo.
-2. Edit only the `DATA` block — set `updated` to today, add/merge the day's entries.
-3. Republish the artifact (URL above) via the `url` parameter, with `force: true`
+1. Edit the `DATA` block directly in the local file — set `updated` to today,
+   add/merge the day's entries.
+2. Republish the artifact (URL above) via the `url` parameter, with `force: true`
    (see CLAUDE.md Artifacts section for why, and the fallback if it still fails).
-4. Commit `health-tracker.html` straight to `main` and push - no PR, no merge, don't
-   ask Kirk (see CLAUDE.md Logging procedure). This is what makes the data
-   recoverable by the next session regardless of artifact-link health.
-5. For feature changes (not data logging): also update this spec, bump the
-   changelog, and republish it (spec artifact URL above).
-6. Keep the app HTML ASCII-only (HTML entities / `\u` escapes for special characters),
+3. For feature changes (not data logging): also update this spec and bump the
+   changelog, and republish it (spec artifact URL above). Still no git push.
+4. Keep the app HTML ASCII-only (HTML entities / `\u` escapes for special characters),
    verified with `node --check` before publishing.
 
 ---
 
 ## Changelog
+
+### v2.21 — 2026-08-05
+- **Reverted v2.20's git-as-backup approach at Kirk's explicit request** ("Stop
+  trying to push to git... At all. Ever."). No more automatic commits/pushes for
+  any change, routine or feature, without Kirk asking in the moment. Source of
+  truth moves back to Kirk's local PC copy at `C:\Users\kcrabb\Downloads\fuel-log\`
+  instead of the `main` branch. This was the one push Kirk authorized, specifically
+  to make the "stop pushing" instruction itself stick for future sessions.
 
 ### v2.20 — 2026-08-05
 - **Git (not the artifact) is now the documented recoverable source of truth.** A

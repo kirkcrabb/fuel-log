@@ -8,25 +8,22 @@ calories, protein, and carbs, update the data, and republish the dashboard artif
 ## Environment & workflow
 
 Sessions normally run as **claude.ai/code cloud sessions on Kirk's personal account
-with this repo selected** (often from his phone).
+with this repo selected** (often from his phone), but Kirk now primarily works from
+his PC with the repo cloned at `C:\Users\kcrabb\Downloads\fuel-log\` — treat
+`health-tracker.html` there as the working copy to edit directly when on that
+machine.
 
-**At session start, read `health-tracker.html`'s `DATA` block straight from this
-repo — that's the reliable source of current data.** Do NOT rely on WebFetching the
-live app artifact to reconcile: a session that didn't publish a given private
-artifact cannot read it back (confirmed 2026-08-05, not a one-off glitch), so a new
-session trying to "fetch the artifact first" gets nothing and silently works from
-stale/missing data. Git is up to date because every publish also gets committed
-straight to this branch (see step 6 below) - no separate reconciliation step needed.
+**NO GIT COMMITS OR PUSHES, EVER, FOR ANY CHANGE — routine or feature — unless Kirk
+explicitly asks in the moment.** (Changed 2026-08-05: git was briefly used to
+auto-commit every publish as a recovery backup, but Kirk asked to stop pushing
+entirely - "at all, ever" - and work from the local PC copy instead. Reading the
+repo is fine if needed; pushing to it is not, under any circumstance, without an
+explicit in-the-moment request.)
 
 - **Routine logging** (meals, workouts, weigh-ins): merge into DATA, republish the app
-  artifact via the `url` parameter, AND commit `health-tracker.html` directly to this
-  branch (no PR, no merge needed - see Logging procedure step 6). The commit is what
-  makes the data recoverable by the next session; the artifact is just the live
-  dashboard Kirk looks at.
-- **Feature changes** (new sections, behavior, targets structure) or an explicit
-  "back up to git" request: also update the spec changelog and open a PR for Kirk to
-  merge. If git write is unavailable (403), say so and give Kirk the full changed
-  files so he can apply them from his PC, which has push access.
+  artifact via the `url` parameter (with `force: true` — see Artifacts section). Done.
+- **Feature changes** (new sections, behavior, targets structure): update the spec
+  changelog too. Still no git push unless Kirk explicitly asks for one in that moment.
 
 Browser verification of feature changes is nice-to-have, not required, in cloud
 sessions; data-only logging never needs it. (`serve.ps1`/`stop-serve.ps1` are for
@@ -101,12 +98,8 @@ chasing one URL - minting fresh is instant and always works.
    publishing (a syntax error here breaks the live page).
 5. If Kirk says he ate a suggested pick, log the item using the pick's `order` string
    verbatim (or identical macros) so the page's pending-entry dedup clears.
-6. **Commit `health-tracker.html` straight to this branch and push - no PR, no
-   merge, don't ask.** This is what makes the data recoverable by the next session
-   (see Environment & workflow above); it is not the "back up to git" feature-change
-   path and Kirk never needs to act on it. If a git conflict/rejection happens
-   because of an earlier bad push, merge favoring the correct content and push
-   normally rather than force-pushing (force-push needs Kirk's explicit OK).
+6. **No git commit or push - not even to `main` directly - unless Kirk explicitly
+   asks for one in that moment** (see Environment & workflow above).
 
 ## Kirk's profile (as of 2026-07-16)
 
