@@ -45,7 +45,12 @@ Windows desktop sessions on Kirk's PC only.)
 ALWAYS republish to these URLs via the Artifact tool's `url` parameter, and try
 **`force: true`** first on any republish that fails (see note below):
 
-- App 🌿 (SOURCE OF TRUTH, migrated 2026-08-05): https://claude.ai/code/artifact/2502cec8-4fd4-4e06-b1f5-7872ad867da0
+- App 🌿 (SOURCE OF TRUTH): https://claude.ai/code/artifact/e4ee80d7-5789-46e8-a7ac-518ba1154177
+  — confirmed 2026-10-02 as the one Kirk actually has open/bookmarked (at v20+ when
+  found); the `2502cec8...` URL previously listed here was stale - a session had
+  minted/updated it without that ever being the link Kirk uses, so changes published
+  there went unseen. If a future session can't tell which URL is live, ask Kirk
+  rather than trusting this file blindly.
 - Spec 📋 (migrated 2026-08-05): https://claude.ai/code/artifact/efa9cdcf-e6a0-40bf-b162-b60d680bf9b2
 - **Stable bookmark (added 2026-08-06):** https://kirkcrabb.github.io/fuel-log/ -
   a permanent link that never changes, served by GitHub Pages from the `gh-pages`
@@ -60,9 +65,11 @@ ALWAYS republish to these URLs via the Artifact tool's `url` parameter, and try
   reconfigured to serve from `main`** - that would publish Kirk's health data
   publicly (repo visibility is public; only the branch Pages serves from keeps data
   private).
-- Old/broken URLs (do not use - permanently stuck, unfixable even with
-  `force: true`, confirmed via A/B testing with byte-identical content that
-  publishes fine elsewhere):
+- Old/broken/unused URLs (do not use):
+  - 2502cec8-4fd4-4e06-b1f5-7872ad867da0 (app - publishes fine, NOT broken, but it's
+    not the URL Kirk actually has bookmarked; a previous session minted/updated it by
+    mistake, listed it here as "SOURCE OF TRUTH", and Kirk never saw the result. Left
+    here so no one re-adopts it.)
   - de2ff8ee-e117-4021-8a5a-c18b9e7edd9d (original app, broken as of 2026-08-04)
   - 6016fa31-707b-42fa-aa9b-cf403ef39ed7 (app, broken within hours of going live)
   - e83a6198-f289-41da-849e-0369720c16f8 (app, broken within an hour of going live)

@@ -4,7 +4,7 @@ A personal food, exercise, and weight tracker that runs as a private Claude arti
 This document is the living spec: it is updated every time a change is requested,
 and the changelog at the bottom records each revision.
 
-**Live app:** https://claude.ai/code/artifact/2502cec8-4fd4-4e06-b1f5-7872ad867da0
+**Live app:** https://claude.ai/code/artifact/e4ee80d7-5789-46e8-a7ac-518ba1154177
 
 ---
 
