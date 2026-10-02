@@ -5,7 +5,7 @@
     --bg:#F3F7F5; --surface:#FFFFFF; --ink:#1B2420; --muted:#5D6D65;
     --line:#DBE4DF; --accent:#0F7B63; --accent-ink:#0A5949; --accent-soft:#E0EFE9;
     --good:#2E8F63; --warn:#C08428; --bad:#B65450;
-    --protein:#4E6FAE; --carbs:#B07E3A;
+    --protein:#4E6FAE; --carbs:#B07E3A; --sodium:#7E6BA8;
     --shadow:0 1px 2px rgba(27,36,32,.06),0 4px 14px rgba(27,36,32,.05);
   }
   @media (prefers-color-scheme: dark){
@@ -13,7 +13,7 @@
       --bg:#0E1412; --surface:#161E1B; --ink:#E6EEEA; --muted:#8FA098;
       --line:#26312C; --accent:#42BA9C; --accent-ink:#7AD6BF; --accent-soft:#14342C;
       --good:#4FBE8B; --warn:#D9A24C; --bad:#D4736F;
-      --protein:#7E9CD6; --carbs:#D3A562;
+      --protein:#7E9CD6; --carbs:#D3A562; --sodium:#A594D6;
       --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.3);
     }
   }
@@ -21,14 +21,14 @@
     --bg:#F3F7F5; --surface:#FFFFFF; --ink:#1B2420; --muted:#5D6D65;
     --line:#DBE4DF; --accent:#0F7B63; --accent-ink:#0A5949; --accent-soft:#E0EFE9;
     --good:#2E8F63; --warn:#C08428; --bad:#B65450;
-    --protein:#4E6FAE; --carbs:#B07E3A;
+    --protein:#4E6FAE; --carbs:#B07E3A; --sodium:#7E6BA8;
     --shadow:0 1px 2px rgba(27,36,32,.06),0 4px 14px rgba(27,36,32,.05);
   }
   :root[data-theme="dark"]{
     --bg:#0E1412; --surface:#161E1B; --ink:#E6EEEA; --muted:#8FA098;
     --line:#26312C; --accent:#42BA9C; --accent-ink:#7AD6BF; --accent-soft:#14342C;
     --good:#4FBE8B; --warn:#D9A24C; --bad:#D4736F;
-    --protein:#7E9CD6; --carbs:#D3A562;
+    --protein:#7E9CD6; --carbs:#D3A562; --sodium:#A594D6;
     --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.3);
   }
   *{box-sizing:border-box}
@@ -91,7 +91,16 @@
   .exrow .detail{color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums}
 
   .charts{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px}
-  .chart{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 14px 8px; box-shadow:var(--shadow)}
+  .chart{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 14px 8px; box-shadow:var(--shadow); position:relative}
+  .wtooltip{
+    position:absolute; left:0; top:0; pointer-events:none; z-index:5;
+    background:var(--ink); color:var(--bg); font-size:12px; font-weight:600;
+    padding:5px 9px; border-radius:8px; white-space:nowrap; box-shadow:var(--shadow);
+    transform:translate(-50%,-100%) translateY(-8px); opacity:0; transition:opacity .12s;
+    font-variant-numeric:tabular-nums;
+  }
+  .wtooltip.show{opacity:1}
+  @media (prefers-reduced-motion: reduce){ .wtooltip{transition:none} }
   .chart .head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px}
   .chart .head b{font-size:13px; font-weight:650}
   .chart .head span{font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums}
@@ -102,6 +111,8 @@
   .weightbig .head span{flex:1}
   .weightbig canvas{height:160px}
   .goalline{font-size:12.5px; color:var(--muted); margin:2px 2px 10px; font-variant-numeric:tabular-nums}
+  .noisenote{font-size:12.5px; color:var(--warn); margin-top:8px}
+  .noisenote:empty{display:none}
   .goalline:empty{display:none}
   .delta-down{color:var(--good); font-weight:600}
   .delta-up{color:var(--warn); font-weight:600}
@@ -178,7 +189,7 @@
     background:var(--bg); color:var(--ink); width:100%;
   }
   .addfoodform input:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-  .afrow{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+  .afrow{display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:8px}
   .afactions{display:flex; gap:8px; justify-content:flex-end}
   .afactions button{
     padding:6px 12px; border-radius:8px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
@@ -243,8 +254,15 @@
         <div class="bar"><div class="fill" id="tCarbFill"></div></div>
         <div class="pct" id="tCarbPct"></div>
       </div>
+      <div class="stat progress">
+        <div class="label"><span class="swatch" style="background:var(--sodium)"></span>Sodium</div>
+        <div class="num" id="tSodium">&ndash;</div>
+        <div class="bar"><div class="fill" id="tSodiumFill"></div></div>
+        <div class="pct" id="tSodiumPct"></div>
+      </div>
       <div class="stat"><div class="label">Weight</div><div class="num" id="tWeight">&ndash;</div></div>
     </div>
+    <div class="noisenote" id="noiseNote"></div>
   </section>
 
   <section>
@@ -277,6 +295,7 @@
       </div>
       <div class="goalline" id="wGoal"></div>
       <canvas id="cWeightBig"></canvas>
+      <div class="wtooltip" id="wTooltip"></div>
     </div>
   </section>
 
@@ -296,6 +315,7 @@
             <input type="number" id="afCal" placeholder="Cal" min="0" step="1" required>
             <input type="number" id="afPro" placeholder="Protein g" min="0" step="1" required>
             <input type="number" id="afCarb" placeholder="Carbs g" min="0" step="1" required>
+            <input type="number" id="afSodium" placeholder="Sodium mg" min="0" step="1">
           </div>
           <div class="afactions">
             <button type="button" id="afCancel">Cancel</button>
@@ -305,7 +325,7 @@
       </div>
       <div class="tablewrap" id="foodWrap">
         <table>
-          <thead><tr><th>Item</th><th class="n">Calories</th><th class="n">Protein g</th><th class="n">Carbs g</th></tr></thead>
+          <thead><tr><th>Item</th><th class="n">Calories</th><th class="n">Protein g</th><th class="n">Carbs g</th><th class="n">Sodium mg</th></tr></thead>
           <tbody id="foodBody"></tbody>
           <tfoot id="foodFoot"></tfoot>
         </table>
@@ -353,20 +373,110 @@
 <script>
 // ===== DATA (maintained by Claude - edit only this block, then republish) =====
 const DATA = {
-  updated: "2026-08-05",
+  updated: "2026-08-21",
   weightUnit: "lbs",
-  targets: { cal: 2100, protein: 150, carbs: 40 },
+  targets: { cal: 2100, protein: 150, carbs: 40, sodium: 1500 },
   goalWeight: 220,
   nextMeal: {
-    context: "breakfast (Thu, doTERRA commute) - carbs ran over yesterday, keep it tight",
+    context: "dinner (Fri, home) - carbs are already over cap today, keep it at zero",
     meals: [
-      { place: "Chick-fil-A (Valley Grove, PG Blvd/I-15)", order: "Egg White Grill, no bun, or a Grilled Breakfast Filet", cal: 300, protein: 28, carbs: 6, note: "Skip the biscuit/hash browns." },
-      { place: "Macey's (State St)", order: "Hard-boiled eggs + string cheese, grab-and-go", cal: 260, protein: 22, carbs: 3, note: "Fastest zero-thought option." },
-      { place: "Maverik (State St)", order: "Egg white & turkey sausage wrap-style bowl (no tortilla if available) or a protein box", cal: 350, protein: 25, carbs: 15, note: "Leg-stop option, but the highest-carb of the three today - pick this one only if the other two aren't convenient." }
+      { place: "Home", order: "Hard-boiled eggs (3)", cal: 210, protein: 18, carbs: 2, sodium: 380, note: "Zero-carb, zero-effort." },
+      { place: "Home", order: "Turkey + pepper jack roll-ups (deli turkey rolled with pepper jack, no bread)", cal: 240, protein: 30, carbs: 2, sodium: 900, note: "No motivation needed - just roll and eat." },
+      { place: "Home", order: "Grilled chicken (plain, no sauce/marinade) + string cheese", cal: 350, protein: 50, carbs: 1, sodium: 450, note: "Straightforward protein if you want something more filling." }
     ],
     snacks: []
   },
   days: {
+    "2026-08-21": {
+      weight: 275.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 317 }
+      ],
+      food: [
+        { item: "Green salad: grilled chicken, eggs, cheese, broccoli, sunflower seeds, very few beets, oil & vinegar", meal: "lunch", cal: 620, protein: 60, carbs: 17, sodium: 450 },
+        { item: "Turkey Bacon Avocado sandwich (closest published match: Corner Bakery's Uptown Turkey Avocado, on bread)", meal: "lunch - Corner Bakery", cal: 720, protein: 41, carbs: 65, sodium: 1450 }
+      ]
+    },
+    "2026-08-19": {
+      food: [
+        { item: "Green salad: grilled chicken, eggs, cheese, broccoli, sunflower seeds, very few beets, oil & vinegar", meal: "lunch", cal: 620, protein: 60, carbs: 17 }
+      ]
+    },
+    "2026-08-18": {
+      weight: 278.9,
+      sodiumFlag: true,
+      food: [
+        { item: "Turkey slices (6) with pepper jack cheese", meal: "lunch", cal: 470, protein: 48, carbs: 6, sodium: 1100 },
+        { item: "Bone-in wings (15-ct), Wingstop, Louisiana Rub", meal: "dinner", cal: 1125, protein: 98, carbs: 3, sodium: 2900 }
+      ]
+    },
+    "2026-08-17": {
+      sodiumFlag: true,
+      food: [
+        { item: "Ultimate Italian, Unwich lettuce wrap (salami, capicola, roast beef, ham, provolone) - estimate from comparable Jimmy John's Unwich items, exact page unreachable", meal: "lunch - Jimmy John's", cal: 650, protein: 40, carbs: 11, sodium: 1900 },
+        { item: "Bone-in wings (15-ct), Buffalo Wild Wings, Buffalo dry rub, no dip", meal: "dinner", cal: 1125, protein: 98, carbs: 4, sodium: 2800 }
+      ]
+    },
+    "2026-08-12": {
+      weight: 278.4,
+      sodiumFlag: true,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 392 }
+      ],
+      food: [
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "breakfast", cal: 230, protein: 42, carbs: 9, sodium: 220 },
+        { item: "Small green salad: grilled chicken, eggs, broccoli, cheese, sunflower seeds, oil & vinegar", meal: "lunch", cal: 515, protein: 49, carbs: 12, sodium: 400 },
+        { item: "Double Quarter Pounder with Cheese, no bun (x3) - published nutrition (sodium: ~1,350mg each)", meal: "dinner - McDonald's", cal: 1770, protein: 144, carbs: 15, sodium: 4050 }
+      ]
+    },
+    "2026-08-11": {
+      weight: 277.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 450 }
+      ],
+      food: [
+        { item: "Cauliflower crust meat lovers pizza, personal size (estimate - cafeteria item, no published nutrition available)", meal: "lunch - doTERRA cafeteria", cal: 950, protein: 50, carbs: 25 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-08-10": {
+      weight: 277.3,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 482 }
+      ],
+      food: [
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "breakfast", cal: 230, protein: 42, carbs: 9 },
+        { item: "Hot Honey Cottage Cheese Protein Bowl with extra protein, half eaten (base bowl is published nutrition info; extra-protein add-on is estimated)", meal: "lunch - Zupas", cal: 285, protein: 25, carbs: 17 },
+        { item: "10\" meat lovers pizza, cauliflower crust, whole pizza (estimate - couldn't reach Summit Pizza's site for exact numbers)", meal: "dinner - Summit Pizza", cal: 1500, protein: 75, carbs: 40 }
+      ]
+    },
+    "2026-08-08": {
+      food: [
+        { item: "Quarter Pounder, no bun (x2)", meal: "lunch - McDonald's", cal: 740, protein: 52, carbs: 6 }
+      ]
+    },
+    "2026-08-07": {
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 589 }
+      ],
+      food: [
+        { item: "Mo' Bettahs mini plate: teriyaki steak (no extra sauce), Pulehu chicken, no rice/mac salad", meal: "lunch", cal: 520, protein: 60, carbs: 10 },
+        { item: "Taco salad, no shell (guac, cheddar, lettuce, taco meat, tomatoes, white sauce) - restaurant nutrition info", meal: "dinner - Arctic Circle", cal: 650, protein: 29, carbs: 28 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "snack", cal: 230, protein: 42, carbs: 9 }
+      ]
+    },
+    "2026-08-06": {
+      weight: 278.9,
+      exercise: [
+        { name: "Stationary bike", minutes: 30, cal: 342 }
+      ],
+      food: [
+        { item: "Hard-boiled eggs (3)", meal: "breakfast", cal: 210, protein: 18, carbs: 2 },
+        { item: "Green salad: grilled chicken, hard-boiled eggs, cheese, broccoli, sunflower seeds, light oil & vinegar", meal: "lunch", cal: 605, protein: 60, carbs: 14 },
+        { item: "Fairlife Core Power Elite, strawberry (42g)", meal: "dinner", cal: 230, protein: 42, carbs: 9 },
+        { item: "Wingstop bone-in wings (15-ct), Louisiana Rub", meal: "dinner", cal: 1125, protein: 98, carbs: 3 }
+      ]
+    },
     "2026-08-05": {
       weight: 280.3,
       exercise: [
@@ -662,8 +772,8 @@ const DATA = {
   })();
 
   function dayTotals(d){
-    const t={cal:0,pro:0,carb:0};
-    (d.food||[]).forEach(f=>{ if(f.pending) return; t.cal+=f.cal||0; t.pro+=f.protein||0; t.carb+=f.carbs||0; });
+    const t={cal:0,pro:0,carb:0,sod:0};
+    (d.food||[]).forEach(f=>{ if(f.pending) return; t.cal+=f.cal||0; t.pro+=f.protein||0; t.carb+=f.carbs||0; t.sod+=f.sodium||0; });
     return t;
   }
   function parseKey(k){ const p=k.split('-'); return new Date(+p[0],p[1]-1,+p[2]); }
@@ -693,7 +803,14 @@ const DATA = {
     setStat('Cal',t.cal,tg.cal,' cal',false,90,110);
     setStat('Pro',t.pro,tg.protein,'g',true,70,100);
     setStat('Carb',t.carb,tg.carbs,'g',false,75,100);
+    setStat('Sodium',t.sod,tg.sodium,'mg',false,75,100);
     if(day.weight!=null) $('tWeight').innerHTML=day.weight+' <small>'+DATA.weightUnit+'</small>';
+    const carbOver=tg.carbs!=null && t.carb>tg.carbs;
+    const sodOver=(tg.sodium!=null && t.sod>tg.sodium) || day.sodiumFlag===true;
+    if(carbOver || sodOver){
+      const bits=[carbOver?'carbs':null, sodOver?'sodium':null].filter(Boolean).join(' and ');
+      $('noiseNote').textContent='Heads up: today ran high on '+bits+' - tomorrow\'s weigh-in may read a bit high from water retention, not fat gain.';
+    }
   }
 
   // next meal recommendations
@@ -702,10 +819,13 @@ const DATA = {
     const t=dayTotals(day);
     const rc=Math.max(0,tgt.cal-t.cal), rp=Math.max(0,tgt.protein-t.pro);
     const rcb=tgt.carbs!=null?Math.max(0,tgt.carbs-t.carb):null;
+    const rsod=tgt.sodium!=null?Math.max(0,tgt.sodium-t.sod):null;
     $('nmBudget').innerHTML='Room left today: about <b>'+fmt(rc)+' cal</b>, <b>'+fmt(rp)+' g protein</b>'+
       (rcb!=null?', <b>'+fmt(rcb)+' g carbs</b>':'')+
+      (rsod!=null?', <b>'+fmt(rsod)+' mg sodium</b>':'')+
       ' <span class="tgt">(target '+fmt(tgt.cal)+' cal / '+fmt(tgt.protein)+'g protein'+
-      (tgt.carbs!=null?' / max '+fmt(tgt.carbs)+'g carbs':'')+')</span>';
+      (tgt.carbs!=null?' / max '+fmt(tgt.carbs)+'g carbs':'')+
+      (tgt.sodium!=null?' / max '+fmt(tgt.sodium)+'mg sodium':'')+')</span>';
   }
   function renderPickList(list){
     return list.map((p,i)=>
@@ -713,7 +833,8 @@ const DATA = {
       '<div class="order">'+esc(p.order)+'</div>'+
       (p.note?'<div class="note">'+esc(p.note)+'</div>':'')+
       '<button class="logbtn" data-i="'+i+'">I ate this</button></div>'+
-      '<div class="macros"><b>~'+fmt(p.cal)+' cal</b>'+fmt(p.protein)+'g protein &middot; '+fmt(p.carbs)+'g carbs</div></div>').join('');
+      '<div class="macros"><b>~'+fmt(p.cal)+' cal</b>'+fmt(p.protein)+'g protein &middot; '+fmt(p.carbs)+'g carbs'+
+      (p.sodium!=null?' &middot; '+fmt(p.sodium)+'mg sodium':'')+'</div></div>').join('');
   }
   function showLogToast(msg){
     const t=$('toast');
@@ -744,17 +865,17 @@ const DATA = {
     container.querySelectorAll('.logbtn').forEach(b=>{
       b.onclick=()=>{
         const p=list[+b.dataset.i];
-        pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs,ts:Date.now(),source:'pick'});
+        pending.push({date:TODAY,item:p.order,meal:p.place,cal:p.cal,protein:p.protein,carbs:p.carbs,sodium:p.sodium,ts:Date.now(),source:'pick'});
         try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
-        showLogToast('Fuel Log: I ate the '+p.place+' pick: '+p.order+' (~'+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs)');
+        showLogToast('Fuel Log: I ate the '+p.place+' pick: '+p.order+' (~'+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs'+(p.sodium!=null?', '+p.sodium+'mg sodium':'')+')');
       };
     });
   }
 
   // manual "Add food" form: stages a food item you enter yourself (own macro numbers),
   // counted toward totals immediately, kept until Claude syncs it into DATA (or 7 days)
-  function addManualFood(item,meal,cal,protein,carbs){
-    pending.push({date:TODAY,item:item,meal:meal,cal:cal,protein:protein,carbs:carbs,ts:Date.now(),source:'manual'});
+  function addManualFood(item,meal,cal,protein,carbs,sodium){
+    pending.push({date:TODAY,item:item,meal:meal,cal:cal,protein:protein,carbs:carbs,sodium:sodium,ts:Date.now(),source:'manual'});
     try{ localStorage.setItem(PKEY,JSON.stringify(pending)); }catch(e){}
     location.reload();
   }
@@ -765,8 +886,10 @@ const DATA = {
     const item=$('afItem').value.trim();
     const meal=$('afMeal').value.trim();
     const cal=+$('afCal').value, protein=+$('afPro').value, carbs=+$('afCarb').value;
-    if(!item || !isFinite(cal) || !isFinite(protein) || !isFinite(carbs)) return;
-    addManualFood(item,meal,cal,protein,carbs);
+    const sodiumRaw=$('afSodium').value.trim();
+    const sodium=sodiumRaw?+sodiumRaw:undefined;
+    if(!item || !isFinite(cal) || !isFinite(protein) || !isFinite(carbs) || (sodiumRaw && !isFinite(sodium))) return;
+    addManualFood(item,meal,cal,protein,carbs,sodium);
   };
   const unsyncedPending=pending.filter(p=>p.source==='manual');
   if(unsyncedPending.length){
@@ -774,7 +897,7 @@ const DATA = {
     $('syncCount').textContent=unsyncedPending.length+(unsyncedPending.length===1?' entry':' entries')+' not yet saved to your history';
     $('syncCopyBtn').onclick=()=>{
       showLogToast('Fuel Log - please log these:\n'+unsyncedPending.map(p=>
-        '- '+p.date+': '+p.item+(p.meal?' ('+p.meal+')':'')+' - '+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs'
+        '- '+p.date+': '+p.item+(p.meal?' ('+p.meal+')':'')+' - '+p.cal+' cal, '+p.protein+'g protein, '+p.carbs+'g carbs'+(p.sodium!=null?', '+p.sodium+'mg sodium':'')
       ).join('\n'));
     };
   }
@@ -800,9 +923,10 @@ const DATA = {
       '<tr'+(f.pending?' style="opacity:.72"':'')+'><td>'+esc(f.item)+(f.pending?'<span class="pendingtag">pending</span>':'')+
       (f.unsynced?'<span class="unsyncedtag">not yet saved</span>':'')+
       (f.meal?'<span class="meal">'+esc(f.meal)+'</span>':'')+'</td>'+
-      '<td class="n">'+fmt(f.cal||0)+'</td><td class="n">'+fmt(f.protein||0)+'</td><td class="n">'+fmt(f.carbs||0)+'</td></tr>').join('');
+      '<td class="n">'+fmt(f.cal||0)+'</td><td class="n">'+fmt(f.protein||0)+'</td><td class="n">'+fmt(f.carbs||0)+'</td>'+
+      '<td class="n">'+(f.sodium!=null?fmt(f.sodium):'&ndash;')+'</td></tr>').join('');
     const t=dayTotals(day);
-    $('foodFoot').innerHTML='<tr><td>Total</td><td class="n">'+fmt(t.cal)+'</td><td class="n">'+fmt(t.pro)+'</td><td class="n">'+fmt(t.carb)+'</td></tr>';
+    $('foodFoot').innerHTML='<tr><td>Total</td><td class="n">'+fmt(t.cal)+'</td><td class="n">'+fmt(t.pro)+'</td><td class="n">'+fmt(t.carb)+'</td><td class="n">'+fmt(t.sod)+'</td></tr>';
   } else { $('foodWrap').hidden=true; $('foodEmpty').hidden=false; }
 
   // exercise list
@@ -885,6 +1009,7 @@ const DATA = {
   }
   // weight progress chart with 7d / 30d / 1y ranges
   let weightRange=7;
+  let weightLayout=null;
   function windowSeries(n, get){
     const end=parseKey(DATA.updated), out=[];
     const d=new Date(end); d.setDate(d.getDate()-(n-1));
@@ -911,6 +1036,9 @@ const DATA = {
     const y0=Math.floor(min/step)*step, y1=Math.ceil(max/step)*step===y0?y0+step:Math.ceil(max/step)*step;
     const X=i=>padL+i*(W-padL-padR)/Math.max(1,s.length-1);
     const Y=v=>padT+(y1-v)/(y1-y0)*(H-padT-padB);
+    const dkStart=parseKey(DATA.updated); dkStart.setDate(dkStart.getDate()-(s.length-1));
+    const dks=s.map((v,i)=>{ const dd=new Date(dkStart); dd.setDate(dd.getDate()+i); return dd; });
+    weightLayout={padL,padR,W,H,s,dks,X,Y};
     ctx.font='10px system-ui';
     ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.fillStyle=css('--muted');
     for(let v=y0; v<=y1+1e-9; v+=step){
@@ -953,6 +1081,39 @@ const DATA = {
     s.forEach((v,i)=>{ if(v==null) return; ctx.beginPath(); ctx.arc(X(i),Y(v),2.5,0,7); ctx.fill(); });
     if(lastPt){ ctx.beginPath(); ctx.arc(lastPt[0],lastPt[1],3.5,0,7); ctx.fill(); }
   }
+
+  function showWeightTip(clientX,clientY){
+    if(!weightLayout) return;
+    const {padL,padR,W,s,dks,X,Y}=weightLayout;
+    const n=s.length;
+    const canvas=$('cWeightBig');
+    const rect=canvas.getBoundingClientRect();
+    const relX=clientX-rect.left;
+    let i=Math.round((relX-padL)*(n-1)/Math.max(1,W-padL-padR));
+    i=Math.max(0,Math.min(n-1,i));
+    if(s[i]==null){
+      let lo=i,hi=i,found=-1;
+      while(lo>=0||hi<n){
+        if(lo>=0&&s[lo]!=null){found=lo;break;}
+        if(hi<n&&s[hi]!=null){found=hi;break;}
+        lo--;hi++;
+      }
+      if(found<0){ hideWeightTip(); return; }
+      i=found;
+    }
+    const tip=$('wTooltip');
+    tip.textContent=dks[i].toLocaleDateString(undefined,{month:'short',day:'numeric'})+': '+s[i]+' '+DATA.weightUnit;
+    tip.style.left=(canvas.offsetLeft+X(i))+'px';
+    tip.style.top=(canvas.offsetTop+Y(s[i]))+'px';
+    tip.classList.add('show');
+  }
+  function hideWeightTip(){ $('wTooltip').classList.remove('show'); }
+  (function(){
+    const canvas=$('cWeightBig');
+    canvas.addEventListener('pointermove',e=>showWeightTip(e.clientX,e.clientY));
+    canvas.addEventListener('pointerdown',e=>showWeightTip(e.clientX,e.clientY));
+    canvas.addEventListener('pointerleave',hideWeightTip);
+  })();
 
   function drawWeight(){
     const s=weightSeries(weightRange);
@@ -1000,6 +1161,7 @@ const DATA = {
     b.onclick=()=>{
       weightRange=+b.dataset.range;
       document.querySelectorAll('#wRanges button').forEach(x=>x.classList.toggle('on',x===b));
+      hideWeightTip();
       drawWeight();
     };
   });
@@ -1013,7 +1175,7 @@ const DATA = {
     drawWeight();
     goalLine();
   }
-  window.addEventListener('resize',drawCharts);
+  window.addEventListener('resize',()=>{ hideWeightTip(); drawCharts(); });
   new MutationObserver(drawCharts).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change',drawCharts);
   drawCharts();

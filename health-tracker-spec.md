@@ -29,21 +29,29 @@ page itself.
 
 | Metric | How it's logged | Fields |
 |--------|----------------|--------|
-| Food | Described in chat or via meal photo | item, meal (optional), calories, protein g, carbs g |
+| Food | Described in chat or via meal photo | item, meal (optional), calories, protein g, carbs g, sodium mg (optional) |
 | Exercise | Reported in chat | name, minutes (optional), estimated calories (optional) |
 | Weight | Reported in chat | one value per day, lbs |
 
 ## Dashboard sections
 
-- **Latest day** — stat tiles for the most recent logged day. Calories, protein, and
-  carbs render as progress tiles (consumed / target, percentage, and a fill bar) against
-  `DATA.targets`; weight renders as a plain number (no daily target to progress
-  toward). Color coding is direction-aware: protein is a floor (bad below 70%, warn
-  70-99%, good at/above 100% — more is fine), calories and carbs are caps (good below
-  the warn threshold, warn approaching target, bad at/above 100% — carbs' warn
-  threshold is stricter at 75% since it's a stricter self-imposed cap; calories warns
-  at 90%). The fill bar visually caps at 100% width even when the percentage exceeds
-  it (e.g. carbs at 163%), so the text is the source of truth for overages.
+- **Latest day** — stat tiles for the most recent logged day. Calories, protein,
+  carbs, and sodium render as progress tiles (consumed / target, percentage, and a
+  fill bar) against `DATA.targets`; weight renders as a plain number (no daily target
+  to progress toward). Color coding is direction-aware: protein is a floor (bad below
+  70%, warn 70-99%, good at/above 100% — more is fine); calories, carbs, and sodium
+  are caps (good below the warn threshold, warn approaching target, bad at/above
+  100% — carbs' and sodium's warn thresholds are stricter at 75% since they're
+  stricter self-imposed caps; calories warns at 90%). The fill bar visually caps at
+  100% width even when the percentage exceeds it (e.g. carbs at 163%), so the text is
+  the source of truth for overages.
+- **Water-retention noise note** — a qualitative, non-predictive heads-up line under
+  the stat tiles, shown when the latest day's carbs exceed `DATA.targets.carbs`,
+  sodium exceeds `DATA.targets.sodium`, or the day is flagged `sodiumFlag: true`
+  (Claude's judgment call for notably high-sodium food, e.g. fast food or cafeteria
+  meals, even when the item-level sodium numbers weren't tracked precisely). It warns
+  that the next weigh-in may read high from water retention, not fat gain — deliberately
+  not a formula/prediction, since actual retention isn't reliably modelable per person.
 - **Next meal** — remaining calorie/protein/carb budget for the day (computed against
   `DATA.targets`, currently 2,100 cal / 150 g protein / max 40 g carbs) plus
   Claude-curated picks along Kirk's Pleasant Grove → Provo commute, split into two
@@ -55,9 +63,11 @@ page itself.
   "N lbs to goal · pace X lbs/wk · on track for <month>" once a week of weigh-ins exists.
 - **Weight progress** — dedicated line chart with **7d / 30d / 1y** range toggles,
   current weight, and change over the selected window (green when down, amber when up).
+  Hovering or tapping the chart shows a tooltip with that point's date and weight.
 - **Food log** — itemized table for the latest day with a totals row. Includes an
-  **"+ Add food" form** (item, meal/notes, calories, protein g, carbs g - Kirk's own
-  numbers, no Claude estimate needed) for logging without a chat round-trip; entries
+  **"+ Add food" form** (item, meal/notes, calories, protein g, carbs g, sodium mg
+  optional - Kirk's own numbers, no Claude estimate needed) for logging without a
+  chat round-trip; entries
   stage in `localStorage` as **unsynced** (tagged, counted in totals, kept up to 7
   days) until a **"Copy for Claude"** sync bar batches them into one message to paste
   into a Claude session, which bakes them into `DATA` and clears the tag. Distinct
@@ -78,13 +88,15 @@ Inside the HTML, between the `===== DATA =====` marker comments:
 const DATA = {
   updated: "2026-07-14",      // date of last update
   weightUnit: "lbs",
+  targets: { cal: 2100, protein: 150, carbs: 40, sodium: 1500 },
   days: {
     "2026-07-14": {
       weight: 178.4,
+      sodiumFlag: true,       // optional; Claude's judgment call, omit on ordinary days
       exercise: [ { name: "Morning run", minutes: 30, cal: 320 } ],
       food: [
         { item: "Scrambled eggs, 2 slices toast", meal: "breakfast",
-          cal: 420, protein: 22, carbs: 34 }
+          cal: 420, protein: 22, carbs: 34, sodium: 680 }
       ]
     }
   }
@@ -92,8 +104,14 @@ const DATA = {
 ```
 
 - Date keys are local-time `YYYY-MM-DD`.
-- Daily calorie/protein/carb totals are computed from food items at render time,
-  skipping any item flagged `pending:true` (see below).
+- `sodium` on a food item is optional (grams/mg not always estimable) — omitted items
+  just don't contribute to the sodium total, they don't error or block logging.
+- `sodiumFlag: true` on a day is an optional, separate signal from the day's actual
+  tracked sodium total: Claude sets it when food was notably high-sodium (fast food,
+  cafeteria, cured/processed meats) even if precise per-item sodium wasn't recorded.
+  Never set it to `false` — just omit the field on ordinary days.
+- Daily calorie/protein/carb/sodium totals are computed from food items at render
+  time, skipping any item flagged `pending:true` (see below).
 - Macro numbers are Claude's estimates — close, not lab-grade (noted in the page footer).
 
 ### Client-side pending entries (not part of `DATA`, lives in `localStorage`)
@@ -131,6 +149,30 @@ explicitly asks for one in that moment** (see CLAUDE.md Environment & workflow).
 ---
 
 ## Changelog
+
+### v2.25 — 2026-10-02
+- **Sodium goal added: keep it under 1,500 mg/day.** `DATA.targets.sodium = 1500`.
+  New fourth stat tile (progress style, cap semantics matching carbs: warn at 75%,
+  bad at 100%) between Carbs and Weight. `dayTotals()` now sums sodium alongside
+  cal/protein/carbs. The "+ Add food" form gained an optional Sodium mg input, and
+  the food log table gained a Sodium mg column with a totals row. Next-meal picks
+  now show sodium in their macro line when `sodium` is set on the pick, and "I ate
+  this" / the sync-bar copy text carry it through too. The water-retention noise
+  note (see v2.24) now also fires on real numeric sodium overage
+  (`t.sod > tg.sodium`), not just the `sodiumFlag` boolean.
+- This version also folds in two earlier features that were built and published to
+  the live artifact but never reached git (per the no-git-push rule, only an
+  explicit "back up to git" ask pushes feature work) — documented here retroactively
+  so the spec matches what's actually live:
+  - **v2.23 — weight chart hover/tap tooltip.** Hovering (desktop) or tapping
+    (mobile, via pointer events) the weight progress chart shows a small tooltip
+    with that point's date and weight value, positioned above the nearest data
+    point. Dismissed on pointer-leave, range-button switch, or window resize.
+  - **v2.24 — water-retention noise note (qualitative).** A note under the stat
+    tiles warning that tomorrow's weigh-in may read high from water retention, not
+    fat gain, shown when the day's carbs exceeded the cap or the day carried
+    `sodiumFlag: true`. Deliberately qualitative, not a predictive weight model —
+    actual retention isn't reliably formula-able per person.
 
 ### v2.22 — 2026-08-06
 - **Permanent bookmark link, set up from a separate Claude session:**

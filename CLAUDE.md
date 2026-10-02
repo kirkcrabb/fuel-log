@@ -90,10 +90,18 @@ chasing one URL - minting fresh is instant and always works.
 ## Logging procedure (every time Kirk reports something)
 
 1. Merge into `DATA.days["YYYY-MM-DD"]`:
-   `{weight, exercise:[{name,minutes,cal}], food:[{item,meal,cal,protein,carbs}]}`
+   `{weight, exercise:[{name,minutes,cal}], food:[{item,meal,cal,protein,carbs,sodium}]}`
+   — `sodium` (mg) is optional per item; include it when estimable, skip it when not
+   (it just won't count toward the day's sodium total).
 2. Estimate macros for described meals; **nutrition-label or restaurant-published
    numbers beat estimates; Kirk's Apple Watch calories beat MET estimates**
-   (his 30-min stationary bike ≈ 280 active cal per the watch).
+   (his 30-min stationary bike ≈ 280 active cal per the watch). Target: **under
+   1,500 mg sodium/day** (`DATA.targets.sodium`). Fast food, cafeteria food, and
+   cured/processed meats are usually high-sodium — estimate from published nutrition
+   when available (restaurant sites, nutrition labels), and if a day's food runs
+   notably high-sodium even without precise numbers, set `sodiumFlag: true` on that
+   day (never `false` — just omit it on ordinary days) so the water-retention noise
+   note still fires.
 3. Set `DATA.updated` to today. Refresh `DATA.nextMeal` picks for his remaining budget.
    **`DATA.nextMeal.meals` should always have picks in it — never leave it empty.**
    Cycle breakfast → lunch → dinner → next day's breakfast based on which meal types
